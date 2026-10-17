@@ -42,6 +42,35 @@ public abstract class BaseRepository<TEntity>(NoshContext context) : IBaseReposi
     }
 
     /// <inheritdoc />
+    public virtual async Task<PagedResult<TEntity>> GetPagedAsync(
+        int page,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        CancellationToken cancellationToken = default)
+    {
+        var query = Query(filter);
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var ordered = orderBy is null
+            ? query.OrderBy(e => e.CreatedAt).ThenBy(e => e.Id)
+            : orderBy(query);
+
+        var items = await ordered
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<TEntity> { Items = items, Page = page, PageSize = pageSize, TotalCount = totalCount };
+    }
+
+    /// <inheritdoc />
+    public virtual Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken = default)
+    {
+        return Query(filter).AnyAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public virtual async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
         entity.CreatedAt = DateTimeOffset.UtcNow;

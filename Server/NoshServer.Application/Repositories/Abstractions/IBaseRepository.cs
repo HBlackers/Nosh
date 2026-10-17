@@ -30,6 +30,26 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets one page of non-deleted entities that satisfy the optional filter.
+    /// </summary>
+    /// <param name="page">The 1-based page number.</param>
+    /// <param name="pageSize">The maximum number of items per page.</param>
+    /// <param name="filter">Optional condition to filter the entities by.</param>
+    /// <param name="orderBy">Optional ordering. Defaults to creation time, then identifier, so paging is stable.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    Task<PagedResult<TEntity>> GetPagedAsync(
+        int page,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns whether any non-deleted entity satisfies the filter.
+    /// </summary>
+    Task<bool> AnyAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Adds a new entity and sets its creation timestamp.
     /// </summary>
     Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default);

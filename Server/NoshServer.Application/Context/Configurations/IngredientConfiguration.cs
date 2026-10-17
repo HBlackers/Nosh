@@ -8,7 +8,8 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
 {
     public void Configure(EntityTypeBuilder<Ingredient> builder)
     {
-        builder.Property(i => i.Name).HasMaxLength(200);
+        // citext makes comparisons and the unique index ignore case. Length (200) is enforced by the validator.
+        builder.Property(i => i.Name).HasColumnType("citext");
         builder.HasIndex(i => i.Name).IsUnique().HasFilter("\"IsDeleted\" = false");
     }
 }
