@@ -2,7 +2,11 @@ import { Link } from "@tanstack/react-router";
 import { BookOpen, CalendarDays, Carrot } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
-const itemClass = "flex items-center gap-3 rounded-lg px-3 py-2.5 font-semibold text-cloud-grey";
+const items = [
+  { label: "Calendar", icon: CalendarDays, to: "/" },
+  { label: "Recipes", icon: BookOpen, to: "/recipes" },
+  { label: "Ingredients", icon: Carrot, to: "/ingredients" },
+] as const;
 
 export function SideNav() {
   return (
@@ -13,27 +17,18 @@ export function SideNav() {
 
       <nav aria-label="Main">
         <ul className="flex flex-wrap gap-1 lg:flex-col">
-          <li>
-            <Link
-              to="/"
-              className={`${itemClass} hover:bg-charcoal-raised hover:text-nosh-green data-[status=active]:bg-charcoal-raised data-[status=active]:text-nosh-green`}
-            >
-              <CalendarDays className="size-5" aria-hidden="true" />
-              Calendar
-            </Link>
-          </li>
-          <li>
-            <span aria-disabled="true" className={`${itemClass} cursor-default`}>
-              <BookOpen className="size-5" aria-hidden="true" />
-              Recipes
-            </span>
-          </li>
-          <li>
-            <span aria-disabled="true" className={`${itemClass} cursor-default`}>
-              <Carrot className="size-5" aria-hidden="true" />
-              Ingredients
-            </span>
-          </li>
+          {items.map(({ label, icon: Icon, to }) => (
+            <li key={to}>
+              <Link
+                to={to}
+                activeOptions={{ exact: true, includeSearch: false }}
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 font-semibold text-cloud-grey hover:bg-charcoal-raised hover:text-nosh-green data-[status=active]:bg-charcoal-raised data-[status=active]:text-nosh-green"
+              >
+                <Icon className="size-5" aria-hidden="true" />
+                {label}
+              </Link>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>

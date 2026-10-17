@@ -1,8 +1,6 @@
 import type { MealType, ScheduleOccurrenceResponse } from "@/lib/api/generated";
 import type { ISODate } from "@/lib/dates";
 
-export const MEAL_TYPES: MealType[] = ["Breakfast", "Lunch", "Dinner", "Dessert"];
-
 export type Occurrence = ScheduleOccurrenceResponse;
 
 export function groupByDate(occurrences: Occurrence[]): Map<ISODate, Occurrence[]> {

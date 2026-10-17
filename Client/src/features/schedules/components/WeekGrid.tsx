@@ -1,7 +1,8 @@
 import { Repeat } from "lucide-react";
 import { addDays, formatWeekday, formatWeekdayLong, toISODate } from "@/lib/dates";
 import { cn } from "@/lib/utils";
-import { MEAL_TYPES, type Occurrence, cellKey, groupByDateAndMeal } from "../calendar";
+import { MEAL_TYPES } from "@/lib/enums";
+import { type Occurrence, cellKey, groupByDateAndMeal } from "../calendar";
 
 type WeekGridProps = {
   weekStart: Date;

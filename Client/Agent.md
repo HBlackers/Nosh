@@ -25,12 +25,12 @@ Docker: `docker compose up --build` here (client only) or from the repo root (cl
 
 ## Architecture
 
-The app is **feature-driven**. Each core feature (meals, planner, shopping list, ...) owns a folder under `src/features/` and holds everything it needs. Code shared by more than one feature lives outside `features/`.
+The app is **feature-driven**. Each core feature (recipes, ingredients, calendar, ...) owns a folder under `src/features/` and holds everything it needs. Code shared by more than one feature lives outside `features/`.
 
 ```
 src/
   index.ts / index.html / frontend.tsx   server, HTML shell, React entry (router + query providers)
-  routes/__root.tsx                      root route: composes the app shell (left nav, page, shopping list panel)
+  routes/__root.tsx                      root route: composes the app shell (left nav and the page)
   routeTree.ts                           composes the route tree from each feature's routes
   features/
     <feature>/
@@ -106,10 +106,12 @@ const { data, isPending } = useMeals();
 
 ## Current features and layout
 
-- **App shell:** `routes/__root.tsx` composes `AppLayout` with `SideNav` (left), the page (middle) and `ShoppingListPanel` (right). On small screens the nav becomes a top bar and the panel drops below the page. Keep the layout components feature-agnostic; the root route is where features are plugged in.
-- **`schedules` (the home page, `/`):** a weekly calendar. `?week=YYYY-MM-DD` shows the week containing that date (weeks start on Monday); no param means the current week. It reads `GET /schedules?From=&To=` through `useScheduleOccurrences`. The calendar is `WeekCalendar`, which shows a **grid** (`WeekGrid`: a table with a column per day and a row per meal, Breakfast to Dessert, recipes as chips in the cells, today's column highlighted) when its container is at least `@2xl` wide, and a stacked **list** of days (`WeekList`) otherwise. It switches on the width of its own container (Tailwind `@container` queries), not the screen, because the page shares the screen with the nav and the shopping list. Recurring schedules show a repeat icon. Grouping helpers and the meal row order live in `features/schedules/calendar.ts`.
-- **`shopping-list`:** a placeholder panel with an empty state. Not wired up.
-- **Navigation:** only Calendar is a link. Recipes and Ingredients are shown but unlinked until those pages exist; link them in `components/layout/SideNav.tsx` when they do.
+- **App shell:** `routes/__root.tsx` composes `AppLayout` with `SideNav` (left) and the page. On small screens the nav becomes a top bar above the page.
+- **`schedules` (the home page, `/`):** a weekly calendar. `?week=YYYY-MM-DD` shows the week containing that date (weeks start on Monday); no param means the current week. It reads `GET /schedules?From=&To=` through `useScheduleOccurrences`. The calendar is `WeekCalendar`, which shows a **grid** (`WeekGrid`: a table with a column per day and a row per meal, Breakfast to Dessert, recipes as chips in the cells, today's column highlighted) when its container is at least `@2xl` wide, and a stacked **list** of days (`WeekList`) otherwise. It switches on the width of its own container (Tailwind `@container` queries), not the screen, because the left nav takes part of the screen. Recurring schedules show a repeat icon. Grouping helpers and the meal row order live in `features/schedules/calendar.ts`.
+- **`recipes` (`/recipes`) and `ingredients` (`/ingredients`):** the same page shape: a heading, a search box, (recipes only) dietary filter tabs, a table and a pagination bar. State lives in the URL (`?q=`, `?page=`, `?dietary=`), so back/forward and refresh keep the view. They read `GET /recipes` and `GET /ingredients`, 20 rows per page. Recipes can be filtered by name and dietary requirement (all selected requirements must match). Filtering recipes by meal type needs a server parameter that doesn't exist yet, so there is no meal type filter.
+- **Create dialogs:** the recipes and ingredients pages have a "New ..." button that opens a dialog (`CreateRecipeDialog`, `CreateIngredientDialog`). The form lives in a child component rendered inside the dialog content, so its state resets every time the dialog closes. Forms use plain React state and a mutation hook (`useCreateRecipe`, `useCreateIngredient`) that invalidates that feature's list queries on success; server validation errors are shown with `ErrorList` (`lib/problem.ts` turns an API problem response into messages). The recipe form picks ingredients with `IngredientCombobox` (exported from the ingredients feature), which searches existing ingredients and can add a missing one on the spot.
+- **Shared list pieces** (`components/`): `SearchInput` (debounced, writes the URL after 300ms), `FilterTabs` (an All button plus toggles, so several can be on at once; `showAll={false}` makes it a plain multi-select, used in the recipe form), `Pagination`, `ErrorList`. Use them for any new list page. Enum value lists and display labels (`MEAL_TYPES`, `DIETARY_REQUIREMENTS`, `CUISINES`, `RECIPE_TAGS`, `MEASUREMENT_UNITS`, `humanize`) are in `lib/enums.ts`; URL search parameter parsers are in `lib/search.ts`.
+- **Navigation:** `components/layout/SideNav.tsx` lists the pages; add a new page to its `items` array.
 - **Dates:** the API uses calendar days as `YYYY-MM-DD`. Use the helpers in `lib/dates.ts` (local-day based, no UTC conversion) rather than `toISOString()`. Avoid very new built-ins (for example `Map.groupBy`) since the app has to work on older phones.
 
 ## Gotchas

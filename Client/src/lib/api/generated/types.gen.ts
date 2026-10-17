@@ -357,6 +357,7 @@ export type GetRecipesData = {
     query?: {
         Name?: string;
         Dietary?: Array<DietaryRequirement>;
+        MealType?: MealType;
         Page?: number | string;
         PageSize?: number | string;
     };
@@ -412,6 +413,7 @@ export type GetRecipesSamplesData = {
     query?: {
         Name?: string;
         Dietary?: Array<DietaryRequirement>;
+        MealType?: MealType;
         Page?: number | string;
         PageSize?: number | string;
     };
