@@ -45,6 +45,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "NoshServer.Api v1"));
+
+    // Development only: apply any pending migrations on startup.
+    await using var scope = app.Services.CreateAsyncScope();
+    await scope.ServiceProvider.GetRequiredService<NoshContext>().Database.MigrateAsync();
 }
 
 app.UseHttpsRedirection();
