@@ -93,8 +93,16 @@ Dependencies only point down this table. `Application` never references `Api` or
 - `GET /recipes` returns summaries (no method or lines); `GET /recipes/{id}` returns the full recipe. `RecipeRepository` always loads a recipe with its non-deleted lines, in order, with each line's ingredient.
 - The slug is generated from the name on create (`Ploughman's Lunch` becomes `ploughmans-lunch`) and never changes afterwards. Slug clashes are reported against `Name`.
 - `PUT` replaces the recipe. Lines are reconciled by id: a line with an id is updated, a line without one is added, and existing lines that are left out are soft deleted. The recipe and its lines are saved in one transaction (`RecipeRepository.UpdateAsync`). A line id must belong to the recipe being updated.
-- Deleting a recipe soft deletes its lines in the same transaction.
+- Deleting a recipe soft deletes its lines (and its schedules) in the same transaction.
 - Repositories that persist more than one entity override `AddAsync`/`UpdateAsync`/`DeleteAsync`; they use the base class's protected `Context` for that.
+
+### Schedules (recipes planned on a calendar)
+
+- A `RecipeSchedule` is one row: a recipe, a start date, a meal and an optional recurrence rule (`Frequency` None/Daily/Weekly/Monthly, `Interval`, `DaysOfWeek`, and an end by `EndDate` or `MaxOccurrences`, or neither). **Occurrences are not stored**: `ScheduleExpander` (`Application/Helpers`) works the dates out from the rule when the calendar is read. A one-off is `Frequency = None`.
+- Dates are `DateOnly` (calendar days, no time zones). Weeks start on Monday and "every N weeks" counts from the week the schedule starts in. Monthly repeats on the start date's day of the month, using the last day when the month is shorter. The end date and occurrence limit are counted from the start date, not from the requested range.
+- `GET /schedules?from=&to=&page=&pageSize=` returns a `PagedResponse` of occurrences (date, meal, recurring flag and a light recipe summary), ordered by date then meal. The range is required and limited to 366 days. The full recipe comes from `GET /recipes/{id}`.
+- Changes always apply to the whole schedule (no skipping or moving single occurrences). To change from a date onward, end the schedule and create a new one.
+- Deleting a recipe soft deletes its schedules too (in the same transaction as its ingredient lines, in `RecipeRepository.DeleteAsync`). Schedules aren't tied to a user yet.
 
 ### Sample recipes (configuration data)
 

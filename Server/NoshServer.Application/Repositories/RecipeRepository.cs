@@ -138,7 +138,7 @@ public class RecipeRepository(NoshContext context) : BaseRepository<Recipe>(cont
     }
 
     /// <summary>
-    /// Soft deletes the recipe together with its ingredient lines.
+    /// Soft deletes the recipe together with its ingredient lines and its schedules.
     /// </summary>
     public override async Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
@@ -152,6 +152,14 @@ public class RecipeRepository(NoshContext context) : BaseRepository<Recipe>(cont
                 setters => setters
                     .SetProperty(l => l.IsDeleted, true)
                     .SetProperty(l => l.DeletedAt, now),
+                cancellationToken);
+
+        await Context.RecipeSchedules
+            .Where(s => s.RecipeId == id && !s.IsDeleted)
+            .ExecuteUpdateAsync(
+                setters => setters
+                    .SetProperty(s => s.IsDeleted, true)
+                    .SetProperty(s => s.DeletedAt, now),
                 cancellationToken);
 
         var deleted = await base.DeleteAsync(id, cancellationToken);

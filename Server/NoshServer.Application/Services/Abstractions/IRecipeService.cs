@@ -46,7 +46,7 @@ public interface IRecipeService
     Task<Recipe> UpdateAsync(Recipe recipe, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Deletes a recipe and its ingredient lines. The caller is expected to have checked that it exists.
+    /// Deletes a recipe together with its ingredient lines and its schedules. The caller is expected to have checked that it exists.
     /// </summary>
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }

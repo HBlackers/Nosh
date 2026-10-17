@@ -29,9 +29,11 @@ builder.Services.Configure<SampleRecipesOptions>(builder.Configuration.GetSectio
 builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 builder.Services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
+builder.Services.AddScoped<IRecipeScheduleRepository, RecipeScheduleRepository>();
 
 builder.Services.AddScoped<IIngredientService, IngredientService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
+builder.Services.AddScoped<IRecipeScheduleService, RecipeScheduleService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options => options.AddSchemaTransformer<EnumSchemaTransformer>());

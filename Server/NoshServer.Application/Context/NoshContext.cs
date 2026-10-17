@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NoshServer.Application.Models.Ingredients;
 using NoshServer.Application.Models.Recipes;
+using NoshServer.Application.Models.Schedules;
 
 namespace NoshServer.Application.Context;
 
@@ -28,6 +29,11 @@ public sealed class NoshContext : DbContext
     /// Ingredient lines that link recipes to ingredients.
     /// </summary>
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
+
+    /// <summary>
+    /// Recipes planned on the calendar.
+    /// </summary>
+    public DbSet<RecipeSchedule> RecipeSchedules => Set<RecipeSchedule>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
