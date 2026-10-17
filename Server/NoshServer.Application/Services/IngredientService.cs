@@ -31,23 +31,17 @@ public class IngredientService(IIngredientRepository ingredientRepository, IVali
     }
 
     /// <inheritdoc />
-    public async Task<Ingredient?> UpdateAsync(Guid id, Ingredient changes, CancellationToken cancellationToken = default)
+    public async Task<Ingredient> UpdateAsync(Ingredient ingredient, CancellationToken cancellationToken = default)
     {
-        var existing = await ingredientRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
-        if (existing is null)
-        {
-            return null;
-        }
+        ingredient.Name = ingredient.Name.Trim();
+        await validator.ValidateAndThrowAsync(ingredient, cancellationToken);
 
-        existing.Name = changes.Name.Trim();
-        await validator.ValidateAndThrowAsync(existing, cancellationToken);
-
-        return await ingredientRepository.UpdateAsync(existing, cancellationToken);
+        return await ingredientRepository.UpdateAsync(ingredient, cancellationToken);
     }
 
     /// <inheritdoc />
-    public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return ingredientRepository.DeleteAsync(id, cancellationToken);
+        await ingredientRepository.DeleteAsync(id, cancellationToken);
     }
 }

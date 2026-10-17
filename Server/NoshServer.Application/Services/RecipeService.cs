@@ -1,19 +1,44 @@
 using FluentValidation;
+using Microsoft.Extensions.Options;
 using NoshServer.Application.Helpers;
 using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Recipes;
+using NoshServer.Application.Models.Recipes.Sample;
+using NoshServer.Application.Options;
 using NoshServer.Application.Repositories.Abstractions;
 using NoshServer.Application.Services.Abstractions;
 
 namespace NoshServer.Application.Services;
 
 /// <inheritdoc cref="IRecipeService"/>
-public class RecipeService(IRecipeRepository recipeRepository, IValidator<Recipe> validator) : IRecipeService
+public class RecipeService(
+    IRecipeRepository recipeRepository,
+    IValidator<Recipe> validator,
+    IOptions<SampleRecipesOptions> sampleRecipesOptions) : IRecipeService
 {
+    // Loaded once from configuration through DI and kept in memory; never written to the database.
+    private IReadOnlyList<SampleRecipe> SampleRecipes { get; } = sampleRecipesOptions.Value.Recipes;
+
     /// <inheritdoc />
     public Task<PagedResult<Recipe>> GetPagedAsync(int page, int pageSize, string? name, CancellationToken cancellationToken = default)
     {
         return recipeRepository.SearchAsync(page, pageSize, name, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public PagedResult<SampleRecipe> GetSampleRecipes(int page, int pageSize, string? name)
+    {
+        var matches = string.IsNullOrWhiteSpace(name)
+            ? SampleRecipes
+            : [.. SampleRecipes.Where(r => r.Name.Contains(name.Trim(), StringComparison.OrdinalIgnoreCase))];
+
+        return new PagedResult<SampleRecipe>
+        {
+            Items = [.. matches.Skip((page - 1) * pageSize).Take(pageSize)],
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = matches.Count,
+        };
     }
 
     /// <inheritdoc />
@@ -42,35 +67,20 @@ public class RecipeService(IRecipeRepository recipeRepository, IValidator<Recipe
     }
 
     /// <inheritdoc />
-    public async Task<Recipe?> UpdateAsync(Guid id, Recipe changes, CancellationToken cancellationToken = default)
+    public async Task<Recipe> UpdateAsync(Recipe recipe, CancellationToken cancellationToken = default)
     {
-        var existing = await recipeRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
-        if (existing is null)
-        {
-            return null;
-        }
+        RecipeHelper.Normalise(recipe);
+        await validator.ValidateAndThrowAsync(recipe, cancellationToken);
 
-        changes.Id = existing.Id;
-        changes.Slug = existing.Slug;
-        changes.CreatedAt = existing.CreatedAt;
+        await recipeRepository.UpdateAsync(recipe, cancellationToken);
 
-        RecipeHelper.Normalise(changes);
-
-        foreach (var line in changes.Ingredients!)
-        {
-            line.RecipeId = existing.Id;
-        }
-
-        await validator.ValidateAndThrowAsync(changes, cancellationToken);
-
-        await recipeRepository.UpdateAsync(changes, cancellationToken);
-
-        return await recipeRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
+        // Reload so the response includes each line's ingredient.
+        return (await recipeRepository.GetByIdAsync(recipe.Id, cancellationToken: cancellationToken))!;
     }
 
     /// <inheritdoc />
-    public Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return recipeRepository.DeleteAsync(id, cancellationToken);
+        await recipeRepository.DeleteAsync(id, cancellationToken);
     }
 }

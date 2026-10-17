@@ -11,9 +11,12 @@ public static class IngredientMappings
         return new Ingredient { Name = request.Name };
     }
 
-    public static Ingredient ToModel(this UpdateIngredientRequest request)
+    /// <summary>
+    /// Applies the request to an existing ingredient. Its id and timestamps are left as they are.
+    /// </summary>
+    public static void ApplyTo(this UpdateIngredientRequest request, Ingredient ingredient)
     {
-        return new Ingredient { Name = request.Name };
+        ingredient.Name = request.Name;
     }
 
     public static IngredientResponse ToResponse(this Ingredient ingredient)

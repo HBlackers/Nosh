@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using NoshServer.Api.Contracts.Common;
 using NoshServer.Api.Contracts.Recipes.Requests;
 using NoshServer.Api.Contracts.Recipes.Responses;
+using NoshServer.Api.Contracts.Recipes.Sample.Responses;
 using NoshServer.Api.Mappers;
 using NoshServer.Application.Services.Abstractions;
 
@@ -22,6 +23,20 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
         var result = await recipeService.GetPagedAsync(request.Page, request.PageSize, request.Name, cancellationToken);
 
         return Ok(result.ToResponse(RecipeMappings.ToSummaryResponse));
+    }
+
+    /// <summary>
+    /// Gets a page of the sample recipes supplied from configuration, optionally filtered by name.
+    /// These are not stored in the database.
+    /// </summary>
+    [HttpGet("samples")]
+    [ProducesResponseType<PagedResponse<SampleRecipeResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public IActionResult GetSamples([FromQuery] GetRecipesRequest request)
+    {
+        var result = recipeService.GetSampleRecipes(request.Page, request.PageSize, request.Name);
+
+        return Ok(result.ToResponse(RecipeMappings.ToResponse));
     }
 
     /// <summary>
@@ -59,9 +74,16 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateRecipeRequest request, CancellationToken cancellationToken)
     {
-        var recipe = await recipeService.UpdateAsync(id, request.ToModel(), cancellationToken);
+        var recipe = await recipeService.GetByIdAsync(id, cancellationToken);
+        if (recipe is null)
+        {
+            return NotFound();
+        }
 
-        return recipe is null ? NotFound() : Ok(recipe.ToResponse());
+        request.ApplyTo(recipe);
+        var updated = await recipeService.UpdateAsync(recipe, cancellationToken);
+
+        return Ok(updated.ToResponse());
     }
 
     /// <summary>
@@ -72,8 +94,14 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var deleted = await recipeService.DeleteAsync(id, cancellationToken);
+        var recipe = await recipeService.GetByIdAsync(id, cancellationToken);
+        if (recipe is null)
+        {
+            return NotFound();
+        }
 
-        return deleted ? NoContent() : NotFound();
+        await recipeService.DeleteAsync(id, cancellationToken);
+
+        return NoContent();
     }
 }

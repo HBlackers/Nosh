@@ -59,9 +59,16 @@ public class IngredientsController(IIngredientService ingredientService) : Contr
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, UpdateIngredientRequest request, CancellationToken cancellationToken)
     {
-        var ingredient = await ingredientService.UpdateAsync(id, request.ToModel(), cancellationToken);
+        var ingredient = await ingredientService.GetByIdAsync(id, cancellationToken);
+        if (ingredient is null)
+        {
+            return NotFound();
+        }
 
-        return ingredient is null ? NotFound() : Ok(ingredient.ToResponse());
+        request.ApplyTo(ingredient);
+        var updated = await ingredientService.UpdateAsync(ingredient, cancellationToken);
+
+        return Ok(updated.ToResponse());
     }
 
     /// <summary>
@@ -72,8 +79,14 @@ public class IngredientsController(IIngredientService ingredientService) : Contr
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var deleted = await ingredientService.DeleteAsync(id, cancellationToken);
+        var ingredient = await ingredientService.GetByIdAsync(id, cancellationToken);
+        if (ingredient is null)
+        {
+            return NotFound();
+        }
 
-        return deleted ? NoContent() : NotFound();
+        await ingredientService.DeleteAsync(id, cancellationToken);
+
+        return NoContent();
     }
 }

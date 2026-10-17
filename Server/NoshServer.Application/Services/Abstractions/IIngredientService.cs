@@ -24,12 +24,13 @@ public interface IIngredientService
     Task<Ingredient> CreateAsync(Ingredient ingredient, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Updates an ingredient's name, or returns null if it does not exist. Throws a validation exception if the new values are invalid.
+    /// Saves an ingredient that has already been loaded and updated by the caller.
+    /// Throws a validation exception if it is invalid.
     /// </summary>
-    Task<Ingredient?> UpdateAsync(Guid id, Ingredient changes, CancellationToken cancellationToken = default);
+    Task<Ingredient> UpdateAsync(Ingredient ingredient, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Deletes an ingredient. Returns false if it does not exist.
+    /// Deletes an ingredient. The caller is expected to have checked that it exists.
     /// </summary>
-    Task<bool> DeleteAsync(Guid id, CancellationToken cancellationToken = default);
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }
