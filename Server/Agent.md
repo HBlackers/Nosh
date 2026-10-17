@@ -25,7 +25,9 @@ ASPNETCORE_ENVIRONMENT=Development dotnet ef migrations add <Name> --project Nos
 ASPNETCORE_ENVIRONMENT=Development dotnet ef database update --project NoshServer.Application --startup-project NoshServer.Api
 ```
 
-Docker: `docker compose up --build` (needs the dev cert exported to `Server/.https/nosh.pfx`, see `compose.yaml`).
+In Development the API applies pending migrations automatically on startup (`Program.cs`), so `dotnet run` against an empty database creates the schema. Other environments, including the Docker compose setup (which runs as Production), do not migrate on startup.
+
+Docker: `docker compose up --build`. In the container the API listens on plain HTTP port 8080 (published as 5161); there is no certificate setup. The HTTPS-only `https` launch profile is for running locally.
 
 ## Projects
 

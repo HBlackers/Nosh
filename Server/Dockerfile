@@ -1,9 +1,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
-# HTTPS only: the certificate is mounted at runtime (see compose.yaml)
-ENV ASPNETCORE_URLS=https://+:8081
-EXPOSE 8081
+EXPOSE 8080
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
