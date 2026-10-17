@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using NoshServer.Application.Helpers;
 using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Recipes;
+using NoshServer.Application.Models.Recipes.Enums;
 using NoshServer.Application.Models.Recipes.Sample;
 using NoshServer.Application.Options;
 using NoshServer.Application.Repositories.Abstractions;
@@ -20,17 +21,32 @@ public class RecipeService(
     private IReadOnlyList<SampleRecipe> SampleRecipes { get; } = sampleRecipesOptions.Value.Recipes;
 
     /// <inheritdoc />
-    public Task<PagedResult<Recipe>> GetPagedAsync(int page, int pageSize, string? name, CancellationToken cancellationToken = default)
+    public Task<PagedResult<Recipe>> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? name,
+        IReadOnlyCollection<DietaryRequirement> dietary,
+        CancellationToken cancellationToken = default)
     {
-        return recipeRepository.SearchAsync(page, pageSize, name, cancellationToken);
+        return recipeRepository.SearchAsync(page, pageSize, name, dietary, cancellationToken);
     }
 
     /// <inheritdoc />
-    public PagedResult<SampleRecipe> GetSampleRecipes(int page, int pageSize, string? name)
+    public PagedResult<SampleRecipe> GetSampleRecipes(int page, int pageSize, string? name, IReadOnlyCollection<DietaryRequirement> dietary)
     {
-        var matches = string.IsNullOrWhiteSpace(name)
-            ? SampleRecipes
-            : [.. SampleRecipes.Where(r => r.Name.Contains(name.Trim(), StringComparison.OrdinalIgnoreCase))];
+        var query = SampleRecipes.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            query = query.Where(r => r.Name.Contains(name.Trim(), StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (dietary.Count > 0)
+        {
+            query = query.Where(r => dietary.All(r.Dietary.Contains));
+        }
+
+        List<SampleRecipe> matches = [.. query];
 
         return new PagedResult<SampleRecipe>
         {

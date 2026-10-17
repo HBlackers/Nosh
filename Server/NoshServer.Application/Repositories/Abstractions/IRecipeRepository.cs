@@ -1,5 +1,6 @@
 using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Recipes;
+using NoshServer.Application.Models.Recipes.Enums;
 
 namespace NoshServer.Application.Repositories.Abstractions;
 
@@ -9,12 +10,14 @@ namespace NoshServer.Application.Repositories.Abstractions;
 public interface IRecipeRepository : IBaseRepository<Recipe>
 {
     /// <summary>
-    /// Gets one page of recipes (without ingredient lines) ordered by name, optionally only those whose name contains the given text (ignoring case).
+    /// Gets one page of recipes (without ingredient lines) ordered by name, optionally only those whose name contains the given
+    /// text (ignoring case) and that satisfy all of the given dietary requirements.
     /// </summary>
     Task<PagedResult<Recipe>> SearchAsync(
         int page,
         int pageSize,
         string? name,
+        IReadOnlyCollection<DietaryRequirement> dietary,
         CancellationToken cancellationToken = default);
 
     /// <summary>

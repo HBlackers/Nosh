@@ -15,9 +15,9 @@ public abstract class BaseRepository<TEntity>(NoshContext context) : IBaseReposi
     where TEntity : BaseEntity
 {
     /// <summary>
-    /// The database context.
+    /// The database context. Repositories use it to start queries from their own SQL (<c>Context.Recipes.FromSql(...)</c>).
     /// </summary>
-    private NoshContext Context { get; } = context;
+    protected NoshContext Context { get; } = context;
 
     /// <summary>
     /// The entity set. Does not exclude soft-deleted rows; use <see cref="Query"/> for reads.
@@ -52,7 +52,32 @@ public abstract class BaseRepository<TEntity>(NoshContext context) : IBaseReposi
         Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default)
     {
-        var query = Query(filter);
+        return await PageAsync(Query(filter), page, pageSize, orderBy, include, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets one page from a query the repository has started itself, typically from its own SQL
+    /// (<c>Context.Recipes.FromSql(...)</c>). Soft-deleted rows are excluded here, so the SQL doesn't need to.
+    /// </summary>
+    protected async Task<PagedResult<TEntity>> GetPagedAsync(
+        IQueryable<TEntity> source,
+        int page,
+        int pageSize,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await PageAsync(source.Where(e => !e.IsDeleted), page, pageSize, orderBy, include, cancellationToken);
+    }
+
+    private static async Task<PagedResult<TEntity>> PageAsync(
+        IQueryable<TEntity> query,
+        int page,
+        int pageSize,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include,
+        CancellationToken cancellationToken)
+    {
         var totalCount = await query.CountAsync(cancellationToken);
 
         IQueryable<TEntity> ordered = orderBy is null

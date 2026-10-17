@@ -1,5 +1,6 @@
 using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Recipes;
+using NoshServer.Application.Models.Recipes.Enums;
 using NoshServer.Application.Models.Recipes.Sample;
 
 namespace NoshServer.Application.Services.Abstractions;
@@ -10,15 +11,21 @@ namespace NoshServer.Application.Services.Abstractions;
 public interface IRecipeService
 {
     /// <summary>
-    /// Gets one page of recipes (without ingredient lines) ordered by name, optionally filtered by name.
+    /// Gets one page of recipes (without ingredient lines) ordered by name, optionally filtered by name and by dietary
+    /// requirements (a recipe must satisfy all of the given requirements).
     /// </summary>
-    Task<PagedResult<Recipe>> GetPagedAsync(int page, int pageSize, string? name, CancellationToken cancellationToken = default);
+    Task<PagedResult<Recipe>> GetPagedAsync(
+        int page,
+        int pageSize,
+        string? name,
+        IReadOnlyCollection<DietaryRequirement> dietary,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets one page of the sample recipes loaded from configuration, ordered as configured, optionally filtered by name.
-    /// These are not stored in the database.
+    /// Gets one page of the sample recipes loaded from configuration, ordered as configured, optionally filtered by name and by
+    /// dietary requirements (a recipe must satisfy all of the given requirements). These are not stored in the database.
     /// </summary>
-    PagedResult<SampleRecipe> GetSampleRecipes(int page, int pageSize, string? name);
+    PagedResult<SampleRecipe> GetSampleRecipes(int page, int pageSize, string? name, IReadOnlyCollection<DietaryRequirement> dietary);
 
     /// <summary>
     /// Gets a recipe with its ingredient lines, or null if it does not exist.

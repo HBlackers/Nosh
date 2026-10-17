@@ -5,20 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using NoshServer.Application.Context;
 using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Recipes;
+using NoshServer.Application.Models.Recipes.Enums;
 using NoshServer.Application.Repositories.Abstractions;
 
 namespace NoshServer.Application.Repositories;
 
 /// <inheritdoc cref="IRecipeRepository"/>
-public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
+public class RecipeRepository(NoshContext context) : BaseRepository<Recipe>(context), IRecipeRepository
 {
-    private readonly NoshContext _context;
-
-    public RecipeRepository(NoshContext context) : base(context)
-    {
-        _context = context;
-    }
-
     // A recipe is always loaded with its non-deleted ingredient lines, in order, and each line's ingredient.
     private static readonly Func<IQueryable<Recipe>, IQueryable<Recipe>> WithIngredients = query => query
         .Include(r => r.Ingredients!.Where(l => !l.IsDeleted).OrderBy(l => l.SortOrder))
@@ -29,16 +23,20 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
         int page,
         int pageSize,
         string? name,
+        IReadOnlyCollection<DietaryRequirement> dietary,
         CancellationToken cancellationToken = default)
     {
-        var pattern = string.IsNullOrWhiteSpace(name) ? null : RepositoryHelpers.ContainsPattern(name.Trim());
+        var pattern = RepositoryHelpers.ContainsPattern(name);
+        string[] required = [.. dietary.Distinct().Select(d => d.ToString())];
 
-        return GetPagedAsync(
-            page,
-            pageSize,
-            pattern is null ? null : r => EF.Functions.ILike(r.Name, pattern, "\\"),
-            query => query.OrderBy(r => r.Name),
-            cancellationToken: cancellationToken);
+        // "Dietary" is a text[] column, so @> means the recipe's list contains every requested value.
+        var source = Context.Recipes.FromSql($"""
+            SELECT * FROM "Recipes"
+            WHERE "Name" ILIKE {pattern} ESCAPE '\'
+              AND "Dietary" @> {required}
+            """);
+
+        return GetPagedAsync(source, page, pageSize, query => query.OrderBy(r => r.Name), cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -92,11 +90,11 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
         var lines = entity.Ingredients ?? [];
         var now = DateTimeOffset.UtcNow;
 
-        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await Context.Database.BeginTransactionAsync(cancellationToken);
         try
         {
             List<Guid> keptIds = [.. lines.Where(l => l.Id != Guid.Empty).Select(l => l.Id)];
-            await _context.RecipeIngredients
+            await Context.RecipeIngredients
                 .Where(l => l.RecipeId == entity.Id && !l.IsDeleted && !keptIds.Contains(l.Id))
                 .ExecuteUpdateAsync(
                     setters => setters
@@ -107,7 +105,7 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
             foreach (var line in lines)
             {
                 line.RecipeId = entity.Id;
-                var entry = _context.Entry(line);
+                var entry = Context.Entry(line);
 
                 if (line.Id == Guid.Empty)
                 {
@@ -146,9 +144,9 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
     {
         var now = DateTimeOffset.UtcNow;
 
-        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        await using var transaction = await Context.Database.BeginTransactionAsync(cancellationToken);
 
-        await _context.RecipeIngredients
+        await Context.RecipeIngredients
             .Where(l => l.RecipeId == id && !l.IsDeleted)
             .ExecuteUpdateAsync(
                 setters => setters
@@ -166,7 +164,7 @@ public class RecipeRepository : BaseRepository<Recipe>, IRecipeRepository
     {
         foreach (var line in lines)
         {
-            _context.Entry(line).State = EntityState.Detached;
+            Context.Entry(line).State = EntityState.Detached;
         }
     }
 

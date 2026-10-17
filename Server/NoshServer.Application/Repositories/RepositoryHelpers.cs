@@ -14,10 +14,16 @@ internal static class RepositoryHelpers
     }
 
     /// <summary>
-    /// Builds an ILIKE "contains" pattern for the text, escaping the wildcard characters (escape character is a backslash).
+    /// Builds an ILIKE "contains" pattern for the text, matching any wildcard characters in it literally
+    /// (the escape character is a backslash). Blank text gives <c>%</c>, which matches everything.
     /// </summary>
-    public static string ContainsPattern(string text)
+    public static string ContainsPattern(string? text)
     {
-        return "%" + text.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_") + "%";
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return "%";
+        }
+
+        return "%" + text.Trim().Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_") + "%";
     }
 }

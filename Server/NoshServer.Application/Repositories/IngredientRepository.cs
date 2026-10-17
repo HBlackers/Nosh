@@ -18,14 +18,14 @@ public class IngredientRepository(NoshContext context) : BaseRepository<Ingredie
         string? name,
         CancellationToken cancellationToken = default)
     {
-        var pattern = string.IsNullOrWhiteSpace(name) ? null : RepositoryHelpers.ContainsPattern(name.Trim());
+        var pattern = RepositoryHelpers.ContainsPattern(name);
 
-        return GetPagedAsync(
-            page,
-            pageSize,
-            pattern is null ? null : i => EF.Functions.ILike(i.Name, pattern, "\\"),
-            query => query.OrderBy(i => i.Name),
-            cancellationToken: cancellationToken);
+        var source = Context.Ingredients.FromSql($"""
+            SELECT * FROM "Ingredients"
+            WHERE "Name" ILIKE {pattern} ESCAPE '\'
+            """);
+
+        return GetPagedAsync(source, page, pageSize, query => query.OrderBy(i => i.Name), cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
