@@ -1,8 +1,13 @@
+using FluentValidation;
+using NoshServer.Api.Filters;
+using NoshServer.Application.Context;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
+builder.Services.AddValidatorsFromAssembly(typeof(NoshContext).Assembly);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
@@ -12,6 +17,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options => options.SwaggerEndpoint("/openapi/v1.json", "NoshServer.Api v1"));
 }
 
 app.UseHttpsRedirection();

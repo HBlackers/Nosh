@@ -4,4 +4,33 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "7263:8081"
+    environment:
+      ConnectionStrings__Nosh: Host=db;Port=5432;Database=nosh;Username=nosh;Password=nosh
+      Kestrel__Certificates__Default__Path: /https/nosh.pfx
+      Kestrel__Certificates__Default__Password: nosh
+    volumes:
+      - ./.https:/https:ro
+    depends_on:
+      db:
+        condition: service_healthy
 
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: nosh
+      POSTGRES_USER: nosh
+      POSTGRES_PASSWORD: nosh
+    ports:
+      - "5432:5432"
+    volumes:
+      - nosh-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nosh -d nosh"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  nosh-db:

@@ -1,6 +1,10 @@
 <Solution>
-  <Folder Name="/Solution Items/">
-    <File Path="compose.yaml" />
+  <Folder Name="/Api/">
+    <Project Path="NoshServer.Api/NoshServer.Api.csproj" />
+    <Project Path="NoshServer.Api.Contracts/NoshServer.Api.Contracts.csproj" />
   </Folder>
-  <Project Path="NoshServer.Api.csproj" />
+  <Folder Name="/Application/">
+    <Project Path="NoshServer.Application/NoshServer.Application.csproj" />
+    <Project Path="NoshServer.Application.Models/NoshServer.Application.Models.csproj" />
+  </Folder>
 </Solution>
