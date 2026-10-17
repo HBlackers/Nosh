@@ -29,10 +29,10 @@ public class IngredientRepository(NoshContext context) : BaseRepository<Ingredie
     }
 
     /// <inheritdoc />
-    public Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default)
+    public Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default)
     {
         // The Name column is case-insensitive (citext), so plain equality ignores case.
-        return AnyAsync(i => i.Name == name && (excludeId == null || i.Id != excludeId), cancellationToken);
+        return AnyAsync(i => i.Name == name, cancellationToken);
     }
 
     /// <inheritdoc />

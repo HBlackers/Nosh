@@ -14,11 +14,8 @@ public class IngredientValidator : AbstractValidator<Ingredient>
         RuleFor(i => i.Name)
             .NotEmpty()
             .MaximumLength(200)
-            .MustAsync(async (ingredient, name, cancellationToken) =>
-                !await ingredientRepository.ExistsByNameAsync(
-                    name,
-                    ingredient.Id == Guid.Empty ? null : ingredient.Id,
-                    cancellationToken))
+            .MustAsync(async (name, cancellationToken) =>
+                !await ingredientRepository.ExistsByNameAsync(name, cancellationToken))
             .WithMessage("An ingredient with this name already exists.");
     }
 }

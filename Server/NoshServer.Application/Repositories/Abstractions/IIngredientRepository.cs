@@ -18,7 +18,7 @@ public interface IIngredientRepository : IBaseRepository<Ingredient>
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Returns whether a non-deleted ingredient with this name exists (ignoring case), optionally excluding one ingredient.
+    /// Returns whether a non-deleted ingredient with this name exists (ignoring case).
     /// </summary>
-    Task<bool> ExistsByNameAsync(string name, Guid? excludeId = null, CancellationToken cancellationToken = default);
+    Task<bool> ExistsByNameAsync(string name, CancellationToken cancellationToken = default);
 }
