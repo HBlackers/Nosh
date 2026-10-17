@@ -10,6 +10,6 @@ public static class PagedMappings
     /// </summary>
     public static PagedResponse<TResponse> ToResponse<TModel, TResponse>(this PagedResult<TModel> result, Func<TModel, TResponse> map)
     {
-        return new PagedResponse<TResponse>(result.Items.Select(map).ToList(), result.Page, result.PageSize, result.TotalCount);
+        return new PagedResponse<TResponse>([.. result.Items.Select(map)], result.Page, result.PageSize, result.TotalCount);
     }
 }

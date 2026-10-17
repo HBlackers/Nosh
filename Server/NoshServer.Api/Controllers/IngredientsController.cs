@@ -8,7 +8,7 @@ using NoshServer.Application.Services.Abstractions;
 namespace NoshServer.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("ingredients")]
 public class IngredientsController(IIngredientService ingredientService) : ControllerBase
 {
     /// <summary>

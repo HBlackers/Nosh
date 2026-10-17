@@ -14,19 +14,23 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     /// </summary>
     /// <param name="id">The entity identifier.</param>
     /// <param name="filter">Optional extra condition the entity must also satisfy.</param>
+    /// <param name="include">Optional shaping of the query, typically to include related entities.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<TEntity?> GetByIdAsync(
         Guid id,
         Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all non-deleted entities that satisfy the optional filter.
     /// </summary>
     /// <param name="filter">Optional condition to filter the entities by.</param>
+    /// <param name="include">Optional shaping of the query, typically to include related entities.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<List<TEntity>> GetAllAsync(
         Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -36,12 +40,14 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     /// <param name="pageSize">The maximum number of items per page.</param>
     /// <param name="filter">Optional condition to filter the entities by.</param>
     /// <param name="orderBy">Optional ordering. Defaults to creation time, then identifier, so paging is stable.</param>
+    /// <param name="include">Optional shaping of the query, typically to include related entities.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     Task<PagedResult<TEntity>> GetPagedAsync(
         int page,
         int pageSize,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>

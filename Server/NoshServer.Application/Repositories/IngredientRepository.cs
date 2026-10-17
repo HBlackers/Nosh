@@ -1,7 +1,6 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using NoshServer.Application.Context;
 using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Ingredients;
@@ -19,14 +18,14 @@ public class IngredientRepository(NoshContext context) : BaseRepository<Ingredie
         string? name,
         CancellationToken cancellationToken = default)
     {
-        var pattern = string.IsNullOrWhiteSpace(name) ? null : $"%{EscapeLike(name.Trim())}%";
+        var pattern = string.IsNullOrWhiteSpace(name) ? null : RepositoryHelpers.ContainsPattern(name.Trim());
 
         return GetPagedAsync(
             page,
             pageSize,
             pattern is null ? null : i => EF.Functions.ILike(i.Name, pattern, "\\"),
             query => query.OrderBy(i => i.Name),
-            cancellationToken);
+            cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -43,7 +42,7 @@ public class IngredientRepository(NoshContext context) : BaseRepository<Ingredie
         {
             return await base.AddAsync(entity, cancellationToken);
         }
-        catch (DbUpdateException exception) when (IsUniqueViolation(exception))
+        catch (DbUpdateException exception) when (exception.IsUniqueViolation())
         {
             throw DuplicateName();
         }
@@ -56,25 +55,14 @@ public class IngredientRepository(NoshContext context) : BaseRepository<Ingredie
         {
             return await base.UpdateAsync(entity, cancellationToken);
         }
-        catch (DbUpdateException exception) when (IsUniqueViolation(exception))
+        catch (DbUpdateException exception) when (exception.IsUniqueViolation())
         {
             throw DuplicateName();
         }
     }
 
-    // Two concurrent requests can both pass the validator; the unique index catches the second.
-    private static bool IsUniqueViolation(DbUpdateException exception)
-    {
-        return exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation };
-    }
-
     private static ValidationException DuplicateName()
     {
         return new ValidationException([new ValidationFailure(nameof(Ingredient.Name), "An ingredient with this name already exists.")]);
-    }
-
-    private static string EscapeLike(string value)
-    {
-        return value.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
     }
 }

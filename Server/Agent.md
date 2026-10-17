@@ -5,9 +5,9 @@ ASP.NET Core (.NET 10) API for Nosh, a meal planning platform. The React front e
 ## Stack
 
 - **ASP.NET Core** controllers, **EF Core** with **Npgsql** (PostgreSQL), **FluentValidation**.
-- **OpenAPI** document at `/openapi/v1.json` (built-in `Microsoft.AspNetCore.OpenApi`) with **Swagger UI** at `/swagger` (Development only). The client generator reads the OpenAPI document, so keep it accurate.
+- **OpenAPI** document at `/openapi/v1.json` (built-in `Microsoft.AspNetCore.OpenApi`) with **Swagger UI** at `/swagger` (Development only). The client generator reads the OpenAPI document, so keep it accurate. Enums are serialised as strings at runtime (`JsonStringEnumConverter` on the MVC JSON options) and described as strings in the document by `OpenApi/EnumSchemaTransformer`; keep both in step. Add further document or schema transformers in `NoshServer.Api/OpenApi/` and register them in `AddOpenApi(...)` in `Program.cs`.
 - HTTPS only: `https://localhost:7263`. The `https` launch profile opens Swagger on startup. There is no HTTP endpoint.
-- Routes have no `/api` prefix (the client's dev server strips it before proxying). Use `[Route("[controller]")]`.
+- Routes have no `/api` prefix (the client's dev server strips it before proxying). Use an explicit lower-case route on each controller (`[Route("ingredients")]`).
 
 ## Commands
 
@@ -32,11 +32,11 @@ Docker: `docker compose up --build` (needs the dev cert exported to `Server/.htt
 | Project | Contains | References |
 | --- | --- | --- |
 | `NoshServer.Api` | Controllers, filters, request/response mapping, `Program.cs` | `Api.Contracts`, `Application` |
-| `NoshServer.Api.Contracts` | Request and response contracts only | nothing |
+| `NoshServer.Api.Contracts` | Request and response contracts only | `Application.Models` (for the shared enums only) |
 | `NoshServer.Application` | Services, repositories, validators, `NoshContext`, other application logic | `Application.Models` |
 | `NoshServer.Application.Models` | Models (entities and domain types) only | nothing |
 
-Dependencies only point down this table. `Application` never references `Api` or `Api.Contracts`, so services speak in models, and controllers map between contracts and models.
+Dependencies only point down this table. `Application` never references `Api` or `Api.Contracts`, so services speak in models, and controllers map between contracts and models. Contracts reuse the enums from `Application.Models` (serialised as strings) so the API and the model can't drift, but must never use entity classes.
 
 ### Organisation: features vs layers
 
@@ -56,7 +56,7 @@ Dependencies only point down this table. `Application` never references `Api` or
   NoshServer.Application/Validators/ProductValidator.cs
   NoshServer.Application/Context/NoshContext.cs
   ```
-  Application layer folders: `Services`, `Repositories`, `Validators`, `Context`.
+  Application layer folders: `Services`, `Repositories`, `Validators`, `Context`, `Helpers` (shared static helpers, for example `RecipeHelper` with `Normalise` and `Slugify`).
   Use feature subfolders inside a layer folder once it gets crowded (`Validators/Products/`).
 - Namespaces follow the folders.
 
@@ -74,7 +74,7 @@ Dependencies only point down this table. `Application` never references `Api` or
 - **Controller**: HTTP only. Takes a request contract, maps it to a model, calls one service, maps the result to a response contract. No business logic, no `NoshContext`, no repositories.
 - **Service**: business logic and orchestration. Works with models. Calls repositories, never `NoshContext` directly, and never the HTTP layer (`HttpContext`, `IActionResult`).
 - **Repository**: all data access for a feature. The only layer that uses `NoshContext` / `DbSet`. Returns models, never `IQueryable`.
-- **`NoshContext`** (`Application/Context/`): EF Core configuration and `DbSet`s. Per-entity configuration goes in `IEntityTypeConfiguration<T>` classes in `Context/Configurations/` (picked up automatically). `NoshContext` turns query tracking off globally (`NoTracking`), so entities returned from queries aren't tracked: repositories must `Add`, `Update` or `Remove` them explicitly to save changes. Soft delete is handled in `BaseRepository`, not the context: reads exclude `IsDeleted` rows and `DeleteAsync` sets `IsDeleted`/`DeletedAt`. `BaseRepository` also sets `CreatedAt`/`UpdatedAt`, and its `GetByIdAsync`/`GetAllAsync` take an optional filter expression so callers can narrow results.
+- **`NoshContext`** (`Application/Context/`): EF Core configuration and `DbSet`s. Per-entity configuration goes in `IEntityTypeConfiguration<T>` classes in `Context/Configurations/` (picked up automatically). `NoshContext` turns query tracking off globally (`NoTracking`), so entities returned from queries aren't tracked: repositories must `Add`, `Update` or `Remove` them explicitly to save changes. Soft delete is handled in `BaseRepository`, not the context: reads exclude `IsDeleted` rows and `DeleteAsync` sets `IsDeleted`/`DeletedAt`. `BaseRepository` also sets `CreatedAt`/`UpdatedAt`, and its `GetByIdAsync`/`GetAllAsync`/`GetPagedAsync` take an optional filter expression and an optional `include` function (for related data), so repositories above can shape queries without the base exposing the context.
 - No skipping layers and no calls upward.
 
 ### Endpoint conventions
@@ -86,9 +86,18 @@ Dependencies only point down this table. `Application` never references `Api` or
 - **Mapping:** contracts to models and back is done with static extension methods in `NoshServer.Api/Mappers/`, not a mapping library.
 - Annotate every action with `ProducesResponseType` so the OpenAPI document (and the generated client) is accurate.
 
+### Aggregates (recipes and their ingredient lines)
+
+- `RecipeIngredient` lines have no controller of their own: they are created, updated and removed through the recipe endpoints, and `RecipesController` is the only entry point.
+- `GET /recipes` returns summaries (no method or lines); `GET /recipes/{id}` returns the full recipe. `RecipeRepository` always loads a recipe with its non-deleted lines, in order, with each line's ingredient.
+- The slug is generated from the name on create (`Ploughman's Lunch` becomes `ploughmans-lunch`) and never changes afterwards. Slug clashes are reported against `Name`.
+- `PUT` replaces the recipe. Lines are reconciled by id: a line with an id is updated, a line without one is added, and existing lines that are left out are soft deleted. The recipe and its lines are saved in one transaction (`RecipeRepository.UpdateAsync`). A line id must belong to the recipe being updated.
+- Deleting a recipe soft deletes its lines in the same transaction.
+- Repositories that persist more than one entity override `AddAsync`/`UpdateAsync`/`DeleteAsync`; they keep their own reference to `NoshContext` for that, since the base class keeps its context private.
+
 ## Validation
 
-- Use **FluentValidation**. Validators live in `NoshServer.Application/Validators/`, one per type they validate, named `<Type>Validator`. `Application` can't see the request contracts, so validators target models.
+- Use **FluentValidation**. Validators live in `NoshServer.Application/Validators/`, one per type they validate, named `<Type>Validator`. `Application` can't see the request contracts, so validators target models. Validation is split by type: a parent validator delegates nested items to a child validator via `SetValidator` (`RecipeValidator` uses `RecipeIngredientValidator` for each ingredient line).
 - Validators are discovered automatically from the Application assembly (`AddValidatorsFromAssembly`) and injected as `IValidator<T>`.
 - **Services run the validator** (`ValidateAndThrowAsync`) before writing, which throws FluentValidation's `ValidationException`. Uniqueness rules go in the validator (via a repository `ExistsBy...` method) and are backed by a unique index; where a race could still hit the index, the repository converts the unique-violation into the same `ValidationException`.
 - Case-insensitive unique names use the Postgres `citext` column type (for example `Ingredient.Name`).

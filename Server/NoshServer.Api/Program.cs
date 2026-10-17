@@ -1,6 +1,8 @@
+using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using NoshServer.Api.Filters;
+using NoshServer.Api.OpenApi;
 using NoshServer.Application.Context;
 using NoshServer.Application.Repositories;
 using NoshServer.Application.Repositories.Abstractions;
@@ -11,7 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers(options => options.Filters.Add<GlobalExceptionFilter>());
+builder.Services
+    .AddControllers(options => options.Filters.Add<GlobalExceptionFilter>())
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
 builder.Services.AddValidatorsFromAssembly(typeof(NoshContext).Assembly);
 
 builder.Services.AddDbContext<NoshContext>(options => options.UseNpgsql(
@@ -23,9 +28,10 @@ builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 builder.Services.AddScoped<IRecipeIngredientRepository, RecipeIngredientRepository>();
 
 builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options => options.AddSchemaTransformer<EnumSchemaTransformer>());
 
 var app = builder.Build();
 

@@ -28,17 +28,19 @@ public abstract class BaseRepository<TEntity>(NoshContext context) : IBaseReposi
     public virtual Task<TEntity?> GetByIdAsync(
         Guid id,
         Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default)
     {
-        return Query(filter).FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        return Query(filter, include).FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
     /// <inheritdoc />
     public virtual Task<List<TEntity>> GetAllAsync(
         Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default)
     {
-        return Query(filter).ToListAsync(cancellationToken);
+        return Query(filter, include).ToListAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -47,16 +49,17 @@ public abstract class BaseRepository<TEntity>(NoshContext context) : IBaseReposi
         int pageSize,
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
         CancellationToken cancellationToken = default)
     {
         var query = Query(filter);
         var totalCount = await query.CountAsync(cancellationToken);
 
-        var ordered = orderBy is null
+        IQueryable<TEntity> ordered = orderBy is null
             ? query.OrderBy(e => e.CreatedAt).ThenBy(e => e.Id)
             : orderBy(query);
 
-        var items = await ordered
+        var items = await (include is null ? ordered : include(ordered))
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
@@ -116,13 +119,20 @@ public abstract class BaseRepository<TEntity>(NoshContext context) : IBaseReposi
     }
 
     /// <summary>
-    /// Starts a read query that excludes soft-deleted rows, with the optional filter applied.
+    /// Starts a read query that excludes soft-deleted rows, with the optional filter and include applied.
     /// </summary>
-    private IQueryable<TEntity> Query(Expression<Func<TEntity, bool>>? filter = null)
+    private IQueryable<TEntity> Query(
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null)
     {
         var query = DbSet.Where(e => !e.IsDeleted);
 
-        return filter is null ? query : query.Where(filter);
+        if (filter is not null)
+        {
+            query = query.Where(filter);
+        }
+
+        return include is null ? query : include(query);
     }
 
     private async Task SaveAndDetachAsync(TEntity entity, CancellationToken cancellationToken)
