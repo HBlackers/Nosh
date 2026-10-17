@@ -56,7 +56,7 @@ Dependencies only point down this table. `Application` never references `Api` or
 ### Placement rules
 
 1. **Abstractions and implementations are always separated.** Within an application layer folder, interfaces live in `<Layer>/Abstractions/` and their implementations directly in `<Layer>/` (for example `Services/Abstractions/IProductService.cs` and `Services/ProductService.cs`). Never put an interface in the same folder as its implementation.
-2. **Models always go in `Application.Models`.** Entities and domain types are never defined in `Application` or `Api`.
+2. **Models always go in `Application.Models`.** Entities and domain types are never defined in `Application` or `Api`. Fixed value sets (cuisine, meal type, dietary requirement, tag, unit) are enums in the feature's `Enums/` folder, stored as text. Every entity inherits `BaseEntity` (`Application.Models/Common/`): `Id` (Guid), `CreatedAt`, `UpdatedAt`, `DeletedAt`, `IsDeleted`.
 3. **Request and response contracts always go in `Api.Contracts`.** Controllers never accept or return a model, and never expose an EF entity.
 4. One controller per domain feature (`ProductsController`, `MealPlansController`), not per table or per action group.
 
@@ -67,7 +67,7 @@ Dependencies only point down this table. `Application` never references `Api` or
 - **Controller**: HTTP only. Takes a request contract, maps it to a model, calls one service, maps the result to a response contract. No business logic, no `NoshContext`, no repositories.
 - **Service**: business logic and orchestration. Works with models. Calls repositories, never `NoshContext` directly, and never the HTTP layer (`HttpContext`, `IActionResult`).
 - **Repository**: all data access for a feature. The only layer that uses `NoshContext` / `DbSet`. Returns models, never `IQueryable`.
-- **`NoshContext`** (`Application/Context/`): EF Core configuration and `DbSet`s. Keep per-entity configuration in `IEntityTypeConfiguration<T>` classes.
+- **`NoshContext`** (`Application/Context/`): EF Core configuration and `DbSet`s. Per-entity configuration goes in `IEntityTypeConfiguration<T>` classes in `Context/Configurations/` (picked up automatically). `NoshContext` turns query tracking off globally (`NoTracking`), so entities returned from queries aren't tracked: repositories must `Add`, `Update` or `Remove` them explicitly to save changes. Soft delete is handled in `BaseRepository`, not the context: reads exclude `IsDeleted` rows and `DeleteAsync` sets `IsDeleted`/`DeletedAt`. `BaseRepository` also sets `CreatedAt`/`UpdatedAt`, and its `GetByIdAsync`/`GetAllAsync` take an optional filter expression so callers can narrow results.
 - No skipping layers and no calls upward.
 
 ## Validation
@@ -84,6 +84,7 @@ It only sees exceptions thrown from controller actions and other MVC filters, no
 ## Conventions
 
 - Nullable reference types and implicit usings are on. Prefer `record` for contracts.
+- Models: XML `<summary>` docs on every type and property. Nullable properties default to `null` explicitly (`= null`). Navigation properties are `virtual`, nullable and default to `null` (they are only populated when loaded with `Include`, and tracking is off), and go at the bottom of the class, after the scalar and foreign-key properties.
 - Async all the way down; pass `CancellationToken` from the action to the repository.
 - Secrets and connection strings come from configuration (`ConnectionStrings:Nosh`), never from code. `appsettings.Development.json` holds local-only defaults.
 - Packages restore from nuget.org; the private `redev` feed is not reachable from every machine.
