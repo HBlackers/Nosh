@@ -8,7 +8,7 @@
     "start": "NODE_ENV=production bun src/index.ts",
     "build": "bun run build.ts",
     "typecheck": "tsc --noEmit",
-    "generate:api": "openapi-ts"
+    "generate:api": "NODE_TLS_REJECT_UNAUTHORIZED=0 openapi-ts"
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.7",

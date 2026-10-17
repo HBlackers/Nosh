@@ -1,21 +1,21 @@
 import { serve } from "bun";
 import index from "./index.html";
 
-// Where /api/* requests are forwarded. Overridden in Docker via compose.
-const API_URL = process.env.API_URL ?? "http://localhost:5161";
+const API_URL = process.env.API_URL ?? "https://localhost:7263";
+// Locally the API runs over HTTPS with the self-signed .NET development certificate, so accept it outside production.
+const allowSelfSigned = process.env.NODE_ENV !== "production";
 
 const server = serve({
   port: Number(process.env.PORT ?? 3000),
   routes: {
-    // Forward API calls to the ASP.NET server so the browser stays same-origin.
     "/api/*": req => {
       const url = new URL(req.url);
-      return fetch(new URL(url.pathname.replace(/^\/api/, "") + url.search, API_URL), req).catch(
+      const target = new URL(url.pathname.replace(/^\/api/, "") + url.search, API_URL);
+      return fetch(new Request(target, req), { tls: { rejectUnauthorized: !allowSelfSigned } }).catch(
         () => new Response("API unavailable", { status: 502 }),
       );
     },
 
-    // Serve index.html for all unmatched routes (SPA fallback).
     "/*": index,
   },
 

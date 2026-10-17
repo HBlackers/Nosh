@@ -19,9 +19,6 @@ declare module "*.module.css" {
 }
 
 declare module "*.png" {
-  /**
-   * A path to the image file
-   */
   const path: `${string}.png`;
   export = path;
 }

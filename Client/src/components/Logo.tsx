@@ -2,10 +2,7 @@ import { cn } from "@/lib/utils";
 import logoFull from "@/assets/logo.png";
 import logoIcon from "@/assets/logo-icon.png";
 
-// Logo rules (see Agent.md): only on Nosh Charcoal or white, keep clear space
-// of at least the width of the "O", never recolour, stretch, rotate or add effects.
 type LogoProps = {
-  /** icon: symbol only. full: master logo (carries its own Charcoal background). */
   variant?: "icon" | "full";
   className?: string;
 };

@@ -1,5 +1,4 @@
-import { homeRoute } from "@/features/home";
+import { calendarRoute } from "@/features/schedules";
 import { rootRoute } from "./routes/__root";
 
-// Compose each feature's routes here.
-export const routeTree = rootRoute.addChildren([homeRoute]);
+export const routeTree = rootRoute.addChildren([calendarRoute]);
