@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+out/
+*.tsbuildinfo
+*.tgz
+
+# Env files (commit .env.example instead)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Test / coverage
+coverage/
+*.lcov
+
+# Caches
+.cache/
+.eslintcache
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store

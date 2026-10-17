@@ -1,0 +1,20 @@
+services:
+  api:
+    image: nosh-api
+    build:
+      context: ./Server
+      dockerfile: Dockerfile
+    ports:
+      - "5161:8080"
+
+  web:
+    image: nosh-web
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      API_URL: http://api:8080
+    depends_on:
+      - api
