@@ -3,6 +3,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Brand palette - see Agent.md "UI rules" before using these directly */
+  --color-nosh-green: #62cc9b;
+  --color-deep-teal: #3aa58f;
+  --color-nosh-charcoal: #2e373e;
+  --color-flame-coral: #f3764b;
+  --color-leaf: #d5c52d;
+  --color-cloud-grey: #b7bfc0;
+
+  /* Derived, AA-safe variants */
+  --color-teal-ink: #1f7a68; /* deep teal for text/links on light surfaces */
+  --color-teal-fill: #4eae9a; /* deep teal for fills that carry charcoal text */
+  --color-coral-fill: #f4845d; /* flame coral for fills that carry charcoal text */
+  --color-charcoal-raised: #333d44; /* raised surface on charcoal */
+  --color-charcoal-soft: #4a555f; /* secondary text on light, borders on dark */
+  --color-mist: #f2f6f4; /* page tint on light */
+  --color-line: #d8dce0; /* borders on light */
+
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  --font-heading: "Nunito", Arial, ui-sans-serif, system-ui, sans-serif;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -23,6 +45,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -41,73 +64,79 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/*
+ * Semantic tokens. Components use these (bg-primary, text-foreground...), never raw hex.
+ * Rule: text is Charcoal on light surfaces and Cloud Grey on Charcoal. Never white or black.
+ */
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+  --background: #f2f6f4;
+  --foreground: #2e373e;
+  --card: #ffffff;
+  --card-foreground: #2e373e;
+  --popover: #ffffff;
+  --popover-foreground: #2e373e;
+  --primary: #62cc9b;
+  --primary-foreground: #2e373e;
+  --secondary: #4eae9a;
+  --secondary-foreground: #2e373e;
+  --muted: #e6ece9;
+  --muted-foreground: #4a555f;
+  --accent: #dff3ea;
+  --accent-foreground: #2e373e;
+  --destructive: #f4845d;
+  --destructive-foreground: #2e373e;
+  --border: #d8dce0;
+  --input: #d8dce0;
+  --ring: #3aa58f;
+  --chart-1: #62cc9b;
+  --chart-2: #3aa58f;
+  --chart-3: #2e373e;
+  --chart-4: #f3764b;
+  --chart-5: #d5c52d;
+  --sidebar: #2e373e;
+  --sidebar-foreground: #b7bfc0;
+  --sidebar-primary: #62cc9b;
+  --sidebar-primary-foreground: #2e373e;
+  --sidebar-accent: #333d44;
+  --sidebar-accent-foreground: #b7bfc0;
+  --sidebar-border: #4a555f;
+  --sidebar-ring: #62cc9b;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #2e373e;
+  --foreground: #b7bfc0;
+  --card: #333d44;
+  --card-foreground: #b7bfc0;
+  --popover: #333d44;
+  --popover-foreground: #b7bfc0;
+  --primary: #62cc9b;
+  --primary-foreground: #2e373e;
+  --secondary: #4eae9a;
+  --secondary-foreground: #2e373e;
+  --muted: #333d44;
+  --muted-foreground: #a5adb0;
+  --accent: #3a4750;
+  --accent-foreground: #b7bfc0;
+  --destructive: #f4845d;
+  --destructive-foreground: #2e373e;
+  --border: #4a555f;
+  --input: #4a555f;
+  --ring: #62cc9b;
+  --chart-1: #62cc9b;
+  --chart-2: #3aa58f;
+  --chart-3: #b7bfc0;
+  --chart-4: #f3764b;
+  --chart-5: #d5c52d;
+  --sidebar: #2e373e;
+  --sidebar-foreground: #b7bfc0;
+  --sidebar-primary: #62cc9b;
+  --sidebar-primary-foreground: #2e373e;
+  --sidebar-accent: #333d44;
+  --sidebar-accent-foreground: #b7bfc0;
+  --sidebar-border: #4a555f;
+  --sidebar-ring: #62cc9b;
 }
 
 @layer base {
@@ -115,6 +144,12 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading font-bold;
   }
 }
