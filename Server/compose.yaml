@@ -1,0 +1,7 @@
+services:
+  noshserver.api:
+    image: noshserver.api
+    build:
+      context: .
+      dockerfile: Dockerfile
+
