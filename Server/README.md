@@ -155,6 +155,14 @@ A `ScheduleEvent` records that one occurrence (`ScheduleId` + `Date`) was `Compl
 - `PUT /inventory/{id}` **sets** the quantity. `DELETE` removes the item. A quantity of zero is not allowed; delete the item instead.
 - `GET /inventory` is paged and searched by ingredient name.
 
+### User preferences
+
+A `UserPreference` is a set of dietary requirements (vegetarian, vegan, gluten free, dairy free) with its own id, served as an ordinary collection at `/preferences` (paged list, get, create, update, delete).
+
+The server **does not cap how many exist**. There are no users yet, and a "only one row" rule baked into the API would be something to rip out when they arrive. A client for a single user keeps one by reading the first item and only creating one when the list is empty. When users are added, a user id goes on the entity and uniqueness is enforced per user.
+
+The preference does not filter anything on the server. Clients apply it by passing `dietary` to `GET /recipes` and `GET /recipes/samples`.
+
 ### Stock availability (the calendar's traffic light)
 
 `StockAllocator` works on an in-memory copy of the inventory and hands it to planned meals one at a time, **in date then meal order**, so a later meal only sees what earlier meals left. If you have two onions and Monday and Thursday both need two, Monday is ready and Thursday is not.

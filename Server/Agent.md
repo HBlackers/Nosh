@@ -112,6 +112,11 @@ Dependencies only point down this table. `Application` never references `Api` or
 - **Completing takes the recipe's ingredients out of stock** in the same transaction as the event (`IUnitOfWork.ExecuteAsync`, `ScheduleEventService`). It takes as much as there is of each ingredient and removes an item that is used up. Skipping leaves stock alone. Deleting an event, or changing completed to skipped, does **not** put stock back. Changing skipped to completed takes the stock then.
 - Occurrences with an event are returned with `Event` set and no `Availability`, and drop out of the shopping list.
 
+### User preferences
+
+- `UserPreference` is a set of dietary requirements (`Dietary`, empty means none) with its own id, exposed as a plain collection at `/preferences` (paged list, get, create, update, delete). **The server deliberately does not limit how many exist**: there are no users yet, and a single-row rule would have to be undone the day there are. A client for a single user keeps one by reading the first item and creating one only when the list is empty. When users arrive, a `UserId` goes on this entity and uniqueness is enforced per user.
+- The preference does not filter anything on the server. Clients apply it by passing `dietary` to `GET /recipes` and `GET /recipes/samples`.
+
 ### Stock availability (calendar status)
 
 - `StockAllocator` (`Application/Helpers`) works on an in-memory copy of the inventory and hands it to meals one at a time, so a later meal only sees what earlier ones left. `GET /schedules` runs it over the pending occurrences in date then meal order. The range only: stock used by meals before `from` isn't counted.

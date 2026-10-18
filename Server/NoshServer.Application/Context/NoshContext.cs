@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NoshServer.Application.Models.Ingredients;
 using NoshServer.Application.Models.Inventory;
+using NoshServer.Application.Models.Preferences;
 using NoshServer.Application.Models.Recipes;
 using NoshServer.Application.Models.Schedules;
 
@@ -45,6 +46,11 @@ public sealed class NoshContext : DbContext
     /// Ingredients in stock.
     /// </summary>
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
+
+    /// <summary>
+    /// Preferences that suit the recipes on offer.
+    /// </summary>
+    public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

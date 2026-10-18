@@ -91,6 +91,33 @@ namespace NoshServer.Application.Context.Migrations
                     b.ToTable("InventoryItems");
                 });
 
+            modelBuilder.Entity("NoshServer.Application.Models.Preferences.UserPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.PrimitiveCollection<string[]>("Dietary")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserPreferences");
+                });
+
             modelBuilder.Entity("NoshServer.Application.Models.Recipes.Recipe", b =>
                 {
                     b.Property<Guid>("Id")

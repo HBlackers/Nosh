@@ -32,6 +32,7 @@ builder.Services.AddScoped<IRecipeIngredientRepository, RecipeIngredientReposito
 builder.Services.AddScoped<IRecipeScheduleRepository, RecipeScheduleRepository>();
 builder.Services.AddScoped<IInventoryItemRepository, InventoryItemRepository>();
 builder.Services.AddScoped<IScheduleEventRepository, ScheduleEventRepository>();
+builder.Services.AddScoped<IUserPreferenceRepository, UserPreferenceRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddScoped<IIngredientService, IngredientService>();
@@ -39,6 +40,7 @@ builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IRecipeScheduleService, RecipeScheduleService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IScheduleEventService, ScheduleEventService>();
+builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
 builder.Services.AddScoped<IShoppingListService, ShoppingListService>();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
