@@ -1,7 +1,9 @@
 import { getRouteApi } from "@tanstack/react-router";
+import { Plus } from "lucide-react";
 import { WeekNav } from "@/components/WeekNav";
 import { Button } from "@/components/ui/button";
 import { formatDayMonth, formatRange, resolveWeek, toISODate } from "@/lib/dates";
+import { ScheduleDialog } from "../components/ScheduleDialog";
 import { WeekCalendar } from "../components/WeekCalendar";
 import { WeekProgress } from "../components/WeekProgress";
 import { useScheduleOccurrences } from "../hooks/useScheduleOccurrences";
@@ -26,7 +28,18 @@ export function CalendarPage() {
           </div>
         </div>
 
-        <WeekNav to="/" weekStart={weekStart} />
+        <div className="flex flex-wrap items-center gap-3">
+          <ScheduleDialog
+            defaults={{ date: toISODate(today) }}
+            trigger={
+              <Button size="lg">
+                <Plus aria-hidden="true" />
+                Plan a recipe
+              </Button>
+            }
+          />
+          <WeekNav to="/" weekStart={weekStart} />
+        </div>
       </div>
 
       {isPending && <p className="text-muted-foreground">Loading your week…</p>}

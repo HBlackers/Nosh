@@ -1,8 +1,10 @@
 import { addDays, formatWeekday, formatWeekdayLong, toISODate } from "@/lib/dates";
+import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MEAL_TYPES } from "@/lib/enums";
 import { type Occurrence, cellKey, groupByDateAndMeal } from "../calendar";
 import { OccurrenceCard } from "./OccurrenceCard";
+import { ScheduleDialog } from "./ScheduleDialog";
 
 type WeekGridProps = {
   weekStart: Date;
@@ -57,6 +59,20 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
                 const items = cells.get(cellKey(iso, meal)) ?? [];
                 return (
                   <td key={iso} className={cn("h-24 border-l p-1 align-top", iso === todayISO && "bg-primary/15")}>
+                    {items.length === 0 && (
+                      <ScheduleDialog
+                        defaults={{ date: iso, mealType: meal, frequency: "None" }}
+                        trigger={
+                          <button
+                            type="button"
+                            aria-label={`Plan a recipe for ${formatWeekdayLong(day)}, ${meal}`}
+                            className="flex h-full min-h-20 w-full items-center justify-center rounded-md border border-dashed text-muted-foreground opacity-60 outline-none hover:bg-accent hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                          >
+                            <Plus className="size-5" aria-hidden="true" />
+                          </button>
+                        }
+                      />
+                    )}
                     {items.length > 0 && (
                       <ul className="space-y-1">
                         {items.map(item => (

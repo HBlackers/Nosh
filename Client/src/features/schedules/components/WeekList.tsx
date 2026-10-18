@@ -1,7 +1,10 @@
 import { addDays, formatWeekday, formatWeekdayLong, toISODate } from "@/lib/dates";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { type Occurrence, groupByDate } from "../calendar";
 import { OccurrenceCard } from "./OccurrenceCard";
+import { ScheduleDialog } from "./ScheduleDialog";
 
 type WeekListProps = {
   weekStart: Date;
@@ -37,7 +40,18 @@ export function WeekList({ weekStart, occurrences, today }: WeekListProps) {
             </div>
 
             {items.length === 0 ? (
-              <p className="self-center text-muted-foreground">Nothing planned</p>
+              <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
+                <p className="text-muted-foreground">Nothing planned</p>
+                <ScheduleDialog
+                  defaults={{ date: iso, frequency: "None" }}
+                  trigger={
+                    <Button variant="outline" size="lg" aria-label={`Plan a recipe for ${formatWeekdayLong(day)}`}>
+                      <Plus aria-hidden="true" />
+                      Plan a recipe
+                    </Button>
+                  }
+                />
+              </div>
             ) : (
               <ul className="flex flex-1 flex-col justify-center gap-2">
                 {items.map(item => (

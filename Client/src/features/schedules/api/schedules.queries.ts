@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getSchedules } from "@/lib/api/generated";
+import { type CreateScheduleRequest, getSchedules, postSchedules } from "@/lib/api/generated";
 import type { ISODate } from "@/lib/dates";
 import { queryRoots } from "@/lib/queryKeys";
 
@@ -19,3 +19,8 @@ export const occurrencesQuery = (from: ISODate, to: ISODate) =>
     queryKey: scheduleKeys.occurrences(from, to),
     queryFn: ({ signal }) => getOccurrences(from, to, signal),
   });
+
+export const createSchedule = async (body: CreateScheduleRequest) => {
+  const { data } = await postSchedules({ body, throwOnError: true });
+  return data;
+};
