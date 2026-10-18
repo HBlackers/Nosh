@@ -31,6 +31,20 @@ public class SchedulesController(IRecipeScheduleService scheduleService) : Contr
     }
 
     /// <summary>
+    /// Gets a page of a recipe's schedules, oldest start date first, including their recurrence rules. Includes schedules
+    /// that have ended.
+    /// </summary>
+    [HttpGet("~/recipes/{recipeId:guid}/schedules")]
+    [ProducesResponseType<PagedResponse<ScheduleResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetByRecipe(Guid recipeId, [FromQuery] PagedRequest request, CancellationToken cancellationToken)
+    {
+        var result = await scheduleService.GetByRecipeAsync(recipeId, request.Page, request.PageSize, cancellationToken);
+
+        return Ok(result.ToResponse(schedule => schedule.ToResponse()));
+    }
+
+    /// <summary>
     /// Gets a schedule, including its recurrence rule.
     /// </summary>
     [HttpGet("{id:guid}")]

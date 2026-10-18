@@ -1,3 +1,4 @@
+using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Schedules;
 
 namespace NoshServer.Application.Repositories.Abstractions;
@@ -11,4 +12,9 @@ public interface IRecipeScheduleRepository : IBaseRepository<RecipeSchedule>
     /// Gets the schedules that could have an occurrence between the two dates (inclusive), with their recipe.
     /// </summary>
     Task<List<RecipeSchedule>> GetOverlappingAsync(DateOnly from, DateOnly to, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets one page of a recipe's schedules, with their recipe, ordered by start date.
+    /// </summary>
+    Task<PagedResult<RecipeSchedule>> GetByRecipeAsync(Guid recipeId, int page, int pageSize, CancellationToken cancellationToken = default);
 }

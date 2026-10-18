@@ -57,6 +57,12 @@ public class RecipeScheduleService(
     }
 
     /// <inheritdoc />
+    public Task<PagedResult<RecipeSchedule>> GetByRecipeAsync(Guid recipeId, int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        return scheduleRepository.GetByRecipeAsync(recipeId, page, pageSize, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<RecipeSchedule?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return scheduleRepository.GetByIdAsync(id, cancellationToken: cancellationToken);

@@ -20,6 +20,11 @@ public interface IRecipeScheduleService
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets one page of a recipe's schedules, ordered by start date.
+    /// </summary>
+    Task<PagedResult<RecipeSchedule>> GetByRecipeAsync(Guid recipeId, int page, int pageSize, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets a schedule with its recipe, or null if it does not exist.
     /// </summary>
     Task<RecipeSchedule?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);

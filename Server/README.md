@@ -137,6 +137,8 @@ A `RecipeSchedule` is a recipe, a start date, a meal and an optional recurrence 
 
 `GET /schedules?from=&to=` returns the occurrences in a range (up to 366 days), ordered by date then meal. Weeks start on Monday and "every N weeks" counts from the week the schedule starts in.
 
+`GET /recipes/{recipeId}/schedules` lists the schedules (rules, not occurrences) for one recipe, including ended ones, so a client can show and change them.
+
 Each occurrence also carries its **event** (if any) and its **availability**, described below.
 
 ### Schedule events: completing and skipping a meal

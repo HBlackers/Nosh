@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using NoshServer.Application.Context;
+using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Schedules;
 using NoshServer.Application.Models.Schedules.Enums;
 using NoshServer.Application.Repositories.Abstractions;
@@ -22,6 +23,18 @@ public class RecipeScheduleRepository(NoshContext context) : BaseRepository<Reci
             s => s.StartDate <= to
                  && ((s.Frequency == RecurrenceFrequency.None && s.StartDate >= from)
                      || (s.Frequency != RecurrenceFrequency.None && (s.EndDate == null || s.EndDate >= from))),
+            WithRecipe,
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<PagedResult<RecipeSchedule>> GetByRecipeAsync(Guid recipeId, int page, int pageSize, CancellationToken cancellationToken = default)
+    {
+        return GetPagedAsync(
+            page,
+            pageSize,
+            s => s.RecipeId == recipeId,
+            query => query.OrderBy(s => s.StartDate).ThenBy(s => s.Id),
             WithRecipe,
             cancellationToken);
     }
