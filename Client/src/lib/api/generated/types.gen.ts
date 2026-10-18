@@ -4,6 +4,12 @@ export type ClientOptions = {
     baseUrl: 'https://localhost:7263/' | (string & {});
 };
 
+export type AddStockRequest = {
+    ingredientId: string;
+    quantity: number | string;
+    unit: null | MeasurementUnit;
+};
+
 export type CreateIngredientRequest = {
     name: string;
 };
@@ -17,6 +23,12 @@ export type CreateRecipeRequest = {
     tags: Array<RecipeTag>;
     method: Array<string>;
     ingredients: Array<RecipeIngredientRequest>;
+};
+
+export type CreateScheduleEventRequest = {
+    scheduleId: string;
+    date: string;
+    status: ScheduleEventStatus;
 };
 
 export type CreateScheduleRequest = {
@@ -41,12 +53,44 @@ export type IngredientResponse = {
     name: string;
 };
 
+export type InventoryItemResponse = {
+    id: string;
+    ingredientId: string;
+    ingredientName: string;
+    quantity: number | string;
+    unit: null | MeasurementUnit;
+};
+
+export type LackingIngredientResponse = {
+    ingredientId: string;
+    ingredientName: string;
+    needed: null | QuantityResponse;
+    available: null | QuantityResponse;
+};
+
+export type MealAvailabilityResponse = {
+    status: MealAvailabilityStatus;
+    ingredientsTotal: number | string;
+    ingredientsCovered: number | string;
+    lacking: Array<LackingIngredientResponse>;
+};
+
+export type MealAvailabilityStatus = 'Ready' | 'Partial' | 'Missing';
+
 export type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Dessert';
 
 export type MeasurementUnit = 'Gram' | 'Millilitre' | 'Tablespoon' | 'Teaspoon' | 'Tin' | 'Clove' | 'Slice' | 'Thumb' | 'Handful' | 'Rasher' | 'Ball';
 
 export type PagedResponseOfIngredientResponse = {
     items: Array<IngredientResponse>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+    totalPages?: number | string;
+};
+
+export type PagedResponseOfInventoryItemResponse = {
+    items: Array<InventoryItemResponse>;
     page: number | string;
     pageSize: number | string;
     totalCount: number | string;
@@ -69,6 +113,14 @@ export type PagedResponseOfSampleRecipeResponse = {
     totalPages?: number | string;
 };
 
+export type PagedResponseOfScheduleEventResponse = {
+    items: Array<ScheduleEventResponse>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+    totalPages?: number | string;
+};
+
 export type PagedResponseOfScheduleOccurrenceResponse = {
     items: Array<ScheduleOccurrenceResponse>;
     page: number | string;
@@ -83,6 +135,11 @@ export type ProblemDetails = {
     status?: null | number | string;
     detail?: null | string;
     instance?: null | string;
+};
+
+export type QuantityResponse = {
+    amount: number | string;
+    unit: null | MeasurementUnit;
 };
 
 export type RecipeIngredientRequest = {
@@ -149,12 +206,23 @@ export type SampleRecipeResponse = {
     ingredients: Array<SampleRecipeIngredientResponse>;
 };
 
+export type ScheduleEventResponse = {
+    id: string;
+    scheduleId: string;
+    date: string;
+    status: ScheduleEventStatus;
+};
+
+export type ScheduleEventStatus = 'Completed' | 'Skipped';
+
 export type ScheduleOccurrenceResponse = {
     scheduleId: string;
     date: string;
     mealType: MealType;
     isRecurring: boolean;
     recipe: ScheduleRecipeResponse;
+    event: null | ScheduleEventResponse;
+    availability: null | MealAvailabilityResponse;
 };
 
 export type ScheduleRecipeResponse = {
@@ -175,8 +243,32 @@ export type ScheduleResponse = {
     maxOccurrences: null | number | string;
 };
 
+export type ShoppingListItemResponse = {
+    ingredientId: string;
+    ingredientName: string;
+    needed: null | QuantityResponse;
+    inStock: null | InventoryItemResponse;
+    toBuy: null | QuantityResponse;
+    status: ShoppingListItemStatus;
+    recipes: Array<ScheduleRecipeResponse>;
+};
+
+export type ShoppingListItemStatus = 'ToBuy' | 'Covered' | 'UnitMismatch';
+
+export type ShoppingListResponse = {
+    from: string;
+    to: string;
+    items: Array<ShoppingListItemResponse>;
+    unplannedStock: Array<InventoryItemResponse>;
+};
+
 export type UpdateIngredientRequest = {
     name: string;
+};
+
+export type UpdateInventoryItemRequest = {
+    quantity: number | string;
+    unit: null | MeasurementUnit;
 };
 
 export type UpdateRecipeRequest = {
@@ -188,6 +280,10 @@ export type UpdateRecipeRequest = {
     tags: Array<RecipeTag>;
     method: Array<string>;
     ingredients: Array<RecipeIngredientRequest>;
+};
+
+export type UpdateScheduleEventRequest = {
+    status: ScheduleEventStatus;
 };
 
 export type UpdateScheduleRequest = {
@@ -351,13 +447,151 @@ export type PutIngredientsByIdResponses = {
 
 export type PutIngredientsByIdResponse = PutIngredientsByIdResponses[keyof PutIngredientsByIdResponses];
 
+export type GetInventoryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        Name?: string;
+        Page?: number | string;
+        PageSize?: number | string;
+    };
+    url: '/inventory';
+};
+
+export type GetInventoryErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type GetInventoryError = GetInventoryErrors[keyof GetInventoryErrors];
+
+export type GetInventoryResponses = {
+    /**
+     * OK
+     */
+    200: PagedResponseOfInventoryItemResponse;
+};
+
+export type GetInventoryResponse = GetInventoryResponses[keyof GetInventoryResponses];
+
+export type PostInventoryData = {
+    body: AddStockRequest;
+    path?: never;
+    query?: never;
+    url: '/inventory';
+};
+
+export type PostInventoryErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type PostInventoryError = PostInventoryErrors[keyof PostInventoryErrors];
+
+export type PostInventoryResponses = {
+    /**
+     * OK
+     */
+    200: InventoryItemResponse;
+};
+
+export type PostInventoryResponse = PostInventoryResponses[keyof PostInventoryResponses];
+
+export type DeleteInventoryByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/inventory/{id}';
+};
+
+export type DeleteInventoryByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteInventoryByIdError = DeleteInventoryByIdErrors[keyof DeleteInventoryByIdErrors];
+
+export type DeleteInventoryByIdResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type DeleteInventoryByIdResponse = DeleteInventoryByIdResponses[keyof DeleteInventoryByIdResponses];
+
+export type GetInventoryByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/inventory/{id}';
+};
+
+export type GetInventoryByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetInventoryByIdError = GetInventoryByIdErrors[keyof GetInventoryByIdErrors];
+
+export type GetInventoryByIdResponses = {
+    /**
+     * OK
+     */
+    200: InventoryItemResponse;
+};
+
+export type GetInventoryByIdResponse = GetInventoryByIdResponses[keyof GetInventoryByIdResponses];
+
+export type PutInventoryByIdData = {
+    body: UpdateInventoryItemRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/inventory/{id}';
+};
+
+export type PutInventoryByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutInventoryByIdError = PutInventoryByIdErrors[keyof PutInventoryByIdErrors];
+
+export type PutInventoryByIdResponses = {
+    /**
+     * OK
+     */
+    200: InventoryItemResponse;
+};
+
+export type PutInventoryByIdResponse = PutInventoryByIdResponses[keyof PutInventoryByIdResponses];
+
 export type GetRecipesData = {
     body?: never;
     path?: never;
     query?: {
         Name?: string;
         Dietary?: Array<DietaryRequirement>;
-        MealType?: MealType;
         Page?: number | string;
         PageSize?: number | string;
     };
@@ -413,7 +647,6 @@ export type GetRecipesSamplesData = {
     query?: {
         Name?: string;
         Dietary?: Array<DietaryRequirement>;
-        MealType?: MealType;
         Page?: number | string;
         PageSize?: number | string;
     };
@@ -522,6 +755,147 @@ export type PutRecipesByIdResponses = {
 };
 
 export type PutRecipesByIdResponse = PutRecipesByIdResponses[keyof PutRecipesByIdResponses];
+
+export type GetScheduleEventsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        ScheduleId?: string;
+        From?: string;
+        To?: string;
+        Page?: number | string;
+        PageSize?: number | string;
+    };
+    url: '/schedule-events';
+};
+
+export type GetScheduleEventsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type GetScheduleEventsError = GetScheduleEventsErrors[keyof GetScheduleEventsErrors];
+
+export type GetScheduleEventsResponses = {
+    /**
+     * OK
+     */
+    200: PagedResponseOfScheduleEventResponse;
+};
+
+export type GetScheduleEventsResponse = GetScheduleEventsResponses[keyof GetScheduleEventsResponses];
+
+export type PostScheduleEventsData = {
+    body: CreateScheduleEventRequest;
+    path?: never;
+    query?: never;
+    url: '/schedule-events';
+};
+
+export type PostScheduleEventsErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type PostScheduleEventsError = PostScheduleEventsErrors[keyof PostScheduleEventsErrors];
+
+export type PostScheduleEventsResponses = {
+    /**
+     * Created
+     */
+    201: ScheduleEventResponse;
+};
+
+export type PostScheduleEventsResponse = PostScheduleEventsResponses[keyof PostScheduleEventsResponses];
+
+export type DeleteScheduleEventsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/schedule-events/{id}';
+};
+
+export type DeleteScheduleEventsByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeleteScheduleEventsByIdError = DeleteScheduleEventsByIdErrors[keyof DeleteScheduleEventsByIdErrors];
+
+export type DeleteScheduleEventsByIdResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type DeleteScheduleEventsByIdResponse = DeleteScheduleEventsByIdResponses[keyof DeleteScheduleEventsByIdResponses];
+
+export type GetScheduleEventsByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/schedule-events/{id}';
+};
+
+export type GetScheduleEventsByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetScheduleEventsByIdError = GetScheduleEventsByIdErrors[keyof GetScheduleEventsByIdErrors];
+
+export type GetScheduleEventsByIdResponses = {
+    /**
+     * OK
+     */
+    200: ScheduleEventResponse;
+};
+
+export type GetScheduleEventsByIdResponse = GetScheduleEventsByIdResponses[keyof GetScheduleEventsByIdResponses];
+
+export type PutScheduleEventsByIdData = {
+    body: UpdateScheduleEventRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/schedule-events/{id}';
+};
+
+export type PutScheduleEventsByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutScheduleEventsByIdError = PutScheduleEventsByIdErrors[keyof PutScheduleEventsByIdErrors];
+
+export type PutScheduleEventsByIdResponses = {
+    /**
+     * OK
+     */
+    200: ScheduleEventResponse;
+};
+
+export type PutScheduleEventsByIdResponse = PutScheduleEventsByIdResponses[keyof PutScheduleEventsByIdResponses];
 
 export type GetSchedulesData = {
     body?: never;
@@ -662,3 +1036,31 @@ export type PutSchedulesByIdResponses = {
 };
 
 export type PutSchedulesByIdResponse = PutSchedulesByIdResponses[keyof PutSchedulesByIdResponses];
+
+export type GetShoppingListData = {
+    body?: never;
+    path?: never;
+    query?: {
+        From?: string;
+        To?: string;
+    };
+    url: '/shopping-list';
+};
+
+export type GetShoppingListErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type GetShoppingListError = GetShoppingListErrors[keyof GetShoppingListErrors];
+
+export type GetShoppingListResponses = {
+    /**
+     * OK
+     */
+    200: ShoppingListResponse;
+};
+
+export type GetShoppingListResponse = GetShoppingListResponses[keyof GetShoppingListResponses];

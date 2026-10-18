@@ -1,8 +1,8 @@
-import { Repeat } from "lucide-react";
 import { addDays, formatWeekday, formatWeekdayLong, toISODate } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { MEAL_TYPES } from "@/lib/enums";
 import { type Occurrence, cellKey, groupByDateAndMeal } from "../calendar";
+import { OccurrenceCard } from "./OccurrenceCard";
 
 type WeekGridProps = {
   weekStart: Date;
@@ -60,12 +60,8 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
                     {items.length > 0 && (
                       <ul className="space-y-1">
                         {items.map(item => (
-                          <li
-                            key={item.scheduleId}
-                            className="wrap-break-word rounded-md border-l-4 border-primary bg-accent px-1.5 py-1.5 text-sm font-semibold leading-snug text-accent-foreground"
-                          >
-                            {item.recipe.name}
-                            {item.isRecurring && <Repeat className="ml-1 inline size-3.5 align-[-2px]" aria-label="Repeats" />}
+                          <li key={`${item.scheduleId}-${item.date}`}>
+                            <OccurrenceCard occurrence={item} />
                           </li>
                         ))}
                       </ul>

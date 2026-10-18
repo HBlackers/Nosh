@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Carrot, ShoppingBasket } from "lucide-react";
+import { BookOpen, CalendarDays, Carrot, Package, ShoppingBasket } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 const items = [
@@ -7,6 +7,7 @@ const items = [
   { label: "Shopping list", icon: ShoppingBasket, to: "/shopping-list" },
   { label: "Recipes", icon: BookOpen, to: "/recipes" },
   { label: "Ingredients", icon: Carrot, to: "/ingredients" },
+  { label: "Inventory", icon: Package, to: "/inventory" },
 ] as const;
 
 export function SideNav() {

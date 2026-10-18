@@ -21,3 +21,9 @@ export function groupByDateAndMeal(occurrences: Occurrence[]): Map<string, Occur
 }
 
 export const cellKey = (date: ISODate, meal: MealType) => `${date}|${meal}`;
+
+export function weekProgress(occurrences: Occurrence[]) {
+  const completed = occurrences.filter(o => o.event?.status === "Completed").length;
+  const skipped = occurrences.filter(o => o.event?.status === "Skipped").length;
+  return { completed, skipped, total: occurrences.length - skipped };
+}

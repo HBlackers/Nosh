@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
-import { type CreateRecipeRequest, type DietaryRequirement, getRecipes, postRecipes } from "@/lib/api/generated";
+import { type CreateRecipeRequest, type DietaryRequirement, getRecipes, getRecipesById, postRecipes } from "@/lib/api/generated";
 
 export type RecipesQuery = {
   name?: string;
@@ -11,6 +11,7 @@ export type RecipesQuery = {
 export const recipeKeys = {
   all: ["recipes"] as const,
   list: (query: RecipesQuery) => [...recipeKeys.all, "list", query] as const,
+  detail: (id: string) => [...recipeKeys.all, "detail", id] as const,
 };
 
 export const getRecipesPage = async (query: RecipesQuery, signal?: AbortSignal) => {
@@ -33,3 +34,14 @@ export const createRecipe = async (body: CreateRecipeRequest) => {
   const { data } = await postRecipes({ body, throwOnError: true });
   return data;
 };
+
+export const getRecipe = async (id: string, signal?: AbortSignal) => {
+  const { data } = await getRecipesById({ path: { id }, signal, throwOnError: true });
+  return data;
+};
+
+export const recipeQuery = (id: string) =>
+  queryOptions({
+    queryKey: recipeKeys.detail(id),
+    queryFn: ({ signal }) => getRecipe(id, signal),
+  });

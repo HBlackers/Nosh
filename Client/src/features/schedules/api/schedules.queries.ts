@@ -1,9 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getSchedules } from "@/lib/api/generated";
 import type { ISODate } from "@/lib/dates";
+import { queryRoots } from "@/lib/queryKeys";
 
 export const scheduleKeys = {
-  all: ["schedules"] as const,
+  all: queryRoots.schedules,
   occurrences: (from: ISODate, to: ISODate) => [...scheduleKeys.all, "occurrences", from, to] as const,
 };
 

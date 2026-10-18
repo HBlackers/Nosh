@@ -1,7 +1,7 @@
-import { Repeat } from "lucide-react";
 import { addDays, formatWeekday, formatWeekdayLong, toISODate } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import { type Occurrence, groupByDate } from "../calendar";
+import { OccurrenceCard } from "./OccurrenceCard";
 
 type WeekListProps = {
   weekStart: Date;
@@ -41,10 +41,9 @@ export function WeekList({ weekStart, occurrences, today }: WeekListProps) {
             ) : (
               <ul className="flex flex-1 flex-col justify-center gap-2">
                 {items.map(item => (
-                  <li key={`${item.scheduleId}-${item.date}`} className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <li key={`${item.scheduleId}-${item.date}`} className="space-y-1">
                     <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">{item.mealType}</span>
-                    <span className="font-semibold">{item.recipe.name}</span>
-                    {item.isRecurring && <Repeat className="size-4 text-muted-foreground" aria-label="Repeats" />}
+                    <OccurrenceCard occurrence={item} />
                   </li>
                 ))}
               </ul>

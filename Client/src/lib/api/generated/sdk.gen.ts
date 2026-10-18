@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteIngredientsByIdData, DeleteIngredientsByIdErrors, DeleteIngredientsByIdResponses, DeleteRecipesByIdData, DeleteRecipesByIdErrors, DeleteRecipesByIdResponses, DeleteSchedulesByIdData, DeleteSchedulesByIdErrors, DeleteSchedulesByIdResponses, GetIngredientsByIdData, GetIngredientsByIdErrors, GetIngredientsByIdResponses, GetIngredientsData, GetIngredientsErrors, GetIngredientsResponses, GetRecipesByIdData, GetRecipesByIdErrors, GetRecipesByIdResponses, GetRecipesData, GetRecipesErrors, GetRecipesResponses, GetRecipesSamplesData, GetRecipesSamplesErrors, GetRecipesSamplesResponses, GetSchedulesByIdData, GetSchedulesByIdErrors, GetSchedulesByIdResponses, GetSchedulesData, GetSchedulesErrors, GetSchedulesResponses, PostIngredientsData, PostIngredientsErrors, PostIngredientsResponses, PostRecipesData, PostRecipesErrors, PostRecipesResponses, PostSchedulesData, PostSchedulesErrors, PostSchedulesResponses, PutIngredientsByIdData, PutIngredientsByIdErrors, PutIngredientsByIdResponses, PutRecipesByIdData, PutRecipesByIdErrors, PutRecipesByIdResponses, PutSchedulesByIdData, PutSchedulesByIdErrors, PutSchedulesByIdResponses } from './types.gen';
+import type { DeleteIngredientsByIdData, DeleteIngredientsByIdErrors, DeleteIngredientsByIdResponses, DeleteInventoryByIdData, DeleteInventoryByIdErrors, DeleteInventoryByIdResponses, DeleteRecipesByIdData, DeleteRecipesByIdErrors, DeleteRecipesByIdResponses, DeleteScheduleEventsByIdData, DeleteScheduleEventsByIdErrors, DeleteScheduleEventsByIdResponses, DeleteSchedulesByIdData, DeleteSchedulesByIdErrors, DeleteSchedulesByIdResponses, GetIngredientsByIdData, GetIngredientsByIdErrors, GetIngredientsByIdResponses, GetIngredientsData, GetIngredientsErrors, GetIngredientsResponses, GetInventoryByIdData, GetInventoryByIdErrors, GetInventoryByIdResponses, GetInventoryData, GetInventoryErrors, GetInventoryResponses, GetRecipesByIdData, GetRecipesByIdErrors, GetRecipesByIdResponses, GetRecipesData, GetRecipesErrors, GetRecipesResponses, GetRecipesSamplesData, GetRecipesSamplesErrors, GetRecipesSamplesResponses, GetScheduleEventsByIdData, GetScheduleEventsByIdErrors, GetScheduleEventsByIdResponses, GetScheduleEventsData, GetScheduleEventsErrors, GetScheduleEventsResponses, GetSchedulesByIdData, GetSchedulesByIdErrors, GetSchedulesByIdResponses, GetSchedulesData, GetSchedulesErrors, GetSchedulesResponses, GetShoppingListData, GetShoppingListErrors, GetShoppingListResponses, PostIngredientsData, PostIngredientsErrors, PostIngredientsResponses, PostInventoryData, PostInventoryErrors, PostInventoryResponses, PostRecipesData, PostRecipesErrors, PostRecipesResponses, PostScheduleEventsData, PostScheduleEventsErrors, PostScheduleEventsResponses, PostSchedulesData, PostSchedulesErrors, PostSchedulesResponses, PutIngredientsByIdData, PutIngredientsByIdErrors, PutIngredientsByIdResponses, PutInventoryByIdData, PutInventoryByIdErrors, PutInventoryByIdResponses, PutRecipesByIdData, PutRecipesByIdErrors, PutRecipesByIdResponses, PutScheduleEventsByIdData, PutScheduleEventsByIdErrors, PutScheduleEventsByIdResponses, PutSchedulesByIdData, PutSchedulesByIdErrors, PutSchedulesByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -42,6 +42,30 @@ export const putIngredientsById = <ThrowOnError extends boolean = false>(options
     }
 });
 
+export const getInventory = <ThrowOnError extends boolean = false>(options?: Options<GetInventoryData, ThrowOnError>): RequestResult<GetInventoryResponses, GetInventoryErrors, ThrowOnError> => (options?.client ?? client).get<GetInventoryResponses, GetInventoryErrors, ThrowOnError>({ url: '/inventory', ...options });
+
+export const postInventory = <ThrowOnError extends boolean = false>(options: Options<PostInventoryData, ThrowOnError>): RequestResult<PostInventoryResponses, PostInventoryErrors, ThrowOnError> => (options.client ?? client).post<PostInventoryResponses, PostInventoryErrors, ThrowOnError>({
+    url: '/inventory',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const deleteInventoryById = <ThrowOnError extends boolean = false>(options: Options<DeleteInventoryByIdData, ThrowOnError>): RequestResult<DeleteInventoryByIdResponses, DeleteInventoryByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteInventoryByIdResponses, DeleteInventoryByIdErrors, ThrowOnError>({ url: '/inventory/{id}', ...options });
+
+export const getInventoryById = <ThrowOnError extends boolean = false>(options: Options<GetInventoryByIdData, ThrowOnError>): RequestResult<GetInventoryByIdResponses, GetInventoryByIdErrors, ThrowOnError> => (options.client ?? client).get<GetInventoryByIdResponses, GetInventoryByIdErrors, ThrowOnError>({ url: '/inventory/{id}', ...options });
+
+export const putInventoryById = <ThrowOnError extends boolean = false>(options: Options<PutInventoryByIdData, ThrowOnError>): RequestResult<PutInventoryByIdResponses, PutInventoryByIdErrors, ThrowOnError> => (options.client ?? client).put<PutInventoryByIdResponses, PutInventoryByIdErrors, ThrowOnError>({
+    url: '/inventory/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
 export const getRecipes = <ThrowOnError extends boolean = false>(options?: Options<GetRecipesData, ThrowOnError>): RequestResult<GetRecipesResponses, GetRecipesErrors, ThrowOnError> => (options?.client ?? client).get<GetRecipesResponses, GetRecipesErrors, ThrowOnError>({ url: '/recipes', ...options });
 
 export const postRecipes = <ThrowOnError extends boolean = false>(options: Options<PostRecipesData, ThrowOnError>): RequestResult<PostRecipesResponses, PostRecipesErrors, ThrowOnError> => (options.client ?? client).post<PostRecipesResponses, PostRecipesErrors, ThrowOnError>({
@@ -61,6 +85,30 @@ export const getRecipesById = <ThrowOnError extends boolean = false>(options: Op
 
 export const putRecipesById = <ThrowOnError extends boolean = false>(options: Options<PutRecipesByIdData, ThrowOnError>): RequestResult<PutRecipesByIdResponses, PutRecipesByIdErrors, ThrowOnError> => (options.client ?? client).put<PutRecipesByIdResponses, PutRecipesByIdErrors, ThrowOnError>({
     url: '/recipes/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const getScheduleEvents = <ThrowOnError extends boolean = false>(options?: Options<GetScheduleEventsData, ThrowOnError>): RequestResult<GetScheduleEventsResponses, GetScheduleEventsErrors, ThrowOnError> => (options?.client ?? client).get<GetScheduleEventsResponses, GetScheduleEventsErrors, ThrowOnError>({ url: '/schedule-events', ...options });
+
+export const postScheduleEvents = <ThrowOnError extends boolean = false>(options: Options<PostScheduleEventsData, ThrowOnError>): RequestResult<PostScheduleEventsResponses, PostScheduleEventsErrors, ThrowOnError> => (options.client ?? client).post<PostScheduleEventsResponses, PostScheduleEventsErrors, ThrowOnError>({
+    url: '/schedule-events',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const deleteScheduleEventsById = <ThrowOnError extends boolean = false>(options: Options<DeleteScheduleEventsByIdData, ThrowOnError>): RequestResult<DeleteScheduleEventsByIdResponses, DeleteScheduleEventsByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeleteScheduleEventsByIdResponses, DeleteScheduleEventsByIdErrors, ThrowOnError>({ url: '/schedule-events/{id}', ...options });
+
+export const getScheduleEventsById = <ThrowOnError extends boolean = false>(options: Options<GetScheduleEventsByIdData, ThrowOnError>): RequestResult<GetScheduleEventsByIdResponses, GetScheduleEventsByIdErrors, ThrowOnError> => (options.client ?? client).get<GetScheduleEventsByIdResponses, GetScheduleEventsByIdErrors, ThrowOnError>({ url: '/schedule-events/{id}', ...options });
+
+export const putScheduleEventsById = <ThrowOnError extends boolean = false>(options: Options<PutScheduleEventsByIdData, ThrowOnError>): RequestResult<PutScheduleEventsByIdResponses, PutScheduleEventsByIdErrors, ThrowOnError> => (options.client ?? client).put<PutScheduleEventsByIdResponses, PutScheduleEventsByIdErrors, ThrowOnError>({
+    url: '/schedule-events/{id}',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -91,3 +139,5 @@ export const putSchedulesById = <ThrowOnError extends boolean = false>(options: 
         ...options.headers
     }
 });
+
+export const getShoppingList = <ThrowOnError extends boolean = false>(options?: Options<GetShoppingListData, ThrowOnError>): RequestResult<GetShoppingListResponses, GetShoppingListErrors, ThrowOnError> => (options?.client ?? client).get<GetShoppingListResponses, GetShoppingListErrors, ThrowOnError>({ url: '/shopping-list', ...options });
