@@ -63,7 +63,7 @@ The API ships as a container built from [`Dockerfile`](Dockerfile) (multi-stage:
 - **Port:** the container listens on plain HTTP `8080`. There is no certificate setup, so terminate TLS in front of it (load balancer or ingress).
 - **Database:** PostgreSQL 17 is what the compose files use. Supply the connection string as `ConnectionStrings__Nosh`.
 - **Migrations are not applied on startup outside Development.** Run them as a deployment step, either with `dotnet ef database update` against the production connection string, or by building a bundle (`dotnet ef migrations bundle`) and running it before the new version starts.
-- **Run the full stack locally in containers** from the repository root: `docker compose up --build` starts the API (published on `5161`), the web client (`3000`) and the database. Note that the compose database password and settings are for local use only.
+- **Run the full stack locally in containers** from the repository root: `docker compose up --build` starts the API (published on `5161`), the web client (`3000`) and the database. The compose files set `ASPNETCORE_ENVIRONMENT=Development`, so the API creates the schema on an empty database and serves Swagger. They are for local use only: the database password and the Development setting must not be copied into a real deployment.
 - **Not in place yet:** authentication (nothing is tied to a user), a health endpoint, and any rate limiting. Treat it as a single-user backend until those exist.
 
 ## Architecture
