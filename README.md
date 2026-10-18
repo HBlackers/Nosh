@@ -39,6 +39,8 @@ Browser  ->  Client server (Bun, :3000)  ->  API (ASP.NET, :8080 / :7263)  ->  P
 
 The [Server README](Server/README.md#domains) explains each of these in detail, including the rules and the trade-offs.
 
+Nosh is for people on older, smaller phones, so the client treats WCAG 2.1 AA contrast, touch-sized targets and a phone-first layout as requirements. The rules are in the [Client README](Client/README.md#accessibility-and-older-phones).
+
 ## Quick start
 
 You need Docker, [.NET 10](https://dotnet.microsoft.com/download) and [Bun](https://bun.sh) for development.
