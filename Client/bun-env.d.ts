@@ -22,3 +22,8 @@ declare module "*.png" {
   const path: `${string}.png`;
   export = path;
 }
+
+declare module "*.woff2" {
+  const path: `${string}.woff2`;
+  export = path;
+}

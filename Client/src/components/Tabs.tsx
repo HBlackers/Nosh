@@ -3,20 +3,23 @@ import { cn } from "@/lib/utils";
 
 type TabsProps<T extends string> = {
   label: string;
-  tabs: { id: T; label: string }[];
+  tabs: { id: T; label: string; count?: number }[];
   value: T;
   onChange: (value: T) => void;
+  // Pass the same id to tabIds() to link each panel to its tab; without it the tabs still work but aren't linked.
+  id?: string;
 };
 
 export function tabIds(base: string, id: string) {
   return { tab: `${base}-tab-${id}`, panel: `${base}-panel-${id}` };
 }
 
-export function Tabs<T extends string>({ label, tabs, value, onChange }: TabsProps<T>) {
-  const base = useId();
+export function Tabs<T extends string>({ label, tabs, value, onChange, id }: TabsProps<T>) {
+  const generated = useId();
+  const base = id ?? generated;
 
   return (
-    <div role="tablist" aria-label={label} className="flex gap-1 border-b">
+    <div role="tablist" aria-label={label} className="flex gap-1 overflow-x-auto border-b">
       {tabs.map(tab => {
         const selected = tab.id === value;
         const ids = tabIds(base, tab.id);
@@ -37,11 +40,17 @@ export function Tabs<T extends string>({ label, tabs, value, onChange }: TabsPro
               }
             }}
             className={cn(
-              "-mb-px min-h-11 border-b-2 px-4 py-2 font-semibold outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
+              "-mb-px flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-2 px-3 py-2 font-semibold outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
               selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >
             {tab.label}
+            {tab.count !== undefined && tab.count > 0 && (
+              <span className="min-w-6 rounded-full bg-primary px-1.5 text-center text-primary-foreground">
+                {tab.count}
+                <span className="sr-only"> planned</span>
+              </span>
+            )}
           </button>
         );
       })}

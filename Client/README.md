@@ -121,7 +121,7 @@ Errors are handled through the query's `error` state in the component. `lib/prob
 
 ### Calendar (`schedules`, home page `/`)
 
-A weekly calendar (`?week=YYYY-MM-DD`, weeks start on Monday) showing every planned recipe as a card, in a grid on wide containers and a stacked list on narrow ones.
+A weekly calendar (`?week=YYYY-MM-DD`, weeks start on Monday) showing every planned recipe as a card, in a grid on wide containers and a stacked list on narrow ones (each day has a tab for each meal, so only one meal's recipes show at a time).
 
 - **Stock colour and tag:** green *Ready*, yellow *Some missing*, coral *Missing*, from the server's per-meal availability. Every state has an icon and a label, so colour is never the only signal.
 - **Quick actions:** a check button completes the meal (the server takes the ingredients out of stock) and Undo returns a done or skipped meal to pending. Completing refreshes the week, so the colours of later meals update.
@@ -136,6 +136,11 @@ A searchable, paged table of what you have. Edit sets a quantity, *Used up* remo
 ### Shopping list (`/shopping-list`)
 
 Reads the server's shopping list for the selected week: **To buy**, **Covered**, and **In stock, not planned**. Ticking an item adds the missing amount to stock, and the row moves to Covered when the list refreshes, so there is no separate "checked" state. Un-ticking is done on the inventory page. Items whose stock is in a unit that cannot be compared link to inventory to fix it.
+
+### Diet and accessibility (nav buttons at the bottom)
+
+- **Diet** opens the saved dietary requirements, which recipes, starter recipes and the planning picker start filtered by. A new visitor sees it first, before anything else.
+- **Accessibility** lets a person change the **text size** (Smaller, Normal, Large, Larger, Largest; Normal is the default) and switch the whole app to a **dyslexia-friendly font** (OpenDyslexic). Both are saved on that device, apply straight away on the next visit, and everything on the page scales with the text size. The font files are only downloaded when someone asks for them.
 
 ### Recipes (`/recipes`) and ingredients (`/ingredients`)
 

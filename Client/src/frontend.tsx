@@ -2,8 +2,11 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { initAccessibility } from "@/features/accessibility";
 import { routeTree } from "./routeTree";
 import "./index.css";
+
+initAccessibility();
 
 const queryClient = new QueryClient();
 const router = createRouter({ routeTree, context: { queryClient } });

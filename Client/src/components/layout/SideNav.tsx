@@ -70,7 +70,7 @@ export function SideNav({ footer }: { footer?: ReactNode }) {
                   onClick={() => setOpen(false)}
                   className="flex min-h-14 items-center gap-4 rounded-lg px-3 py-2.5 text-xl font-semibold text-cloud-grey outline-nosh-green hover:bg-charcoal-raised hover:text-nosh-green data-[status=active]:bg-charcoal-raised data-[status=active]:text-nosh-green lg:min-h-11 lg:gap-3 lg:text-base"
                 >
-                  <Icon className="size-6 lg:size-5" aria-hidden="true" />
+                  <Icon className="size-6 shrink-0 lg:size-5" aria-hidden="true" />
                   {label}
                 </Link>
               </li>
@@ -79,7 +79,7 @@ export function SideNav({ footer }: { footer?: ReactNode }) {
         </nav>
 
         {footer && (
-          <div onClick={() => setOpen(false)} className="mt-auto">
+          <div onClick={() => setOpen(false)} className="mt-auto flex flex-col gap-1">
             {footer}
           </div>
         )}

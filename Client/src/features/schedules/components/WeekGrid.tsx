@@ -23,7 +23,7 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
         <caption className="sr-only">Recipes planned for the week</caption>
         <thead>
           <tr>
-            <td className="w-24" />
+            <td className="w-36" />
             {days.map(day => {
               const isToday = toISODate(day) === todayISO;
               return (
