@@ -19,12 +19,12 @@ export function RecipesPage() {
 
       <nav aria-label="Recipe lists" className="flex gap-2">
         <Button asChild variant={starter ? "outline" : "default"} className="h-10">
-          <Link to="/recipes" search={{}} aria-current={starter ? undefined : "page"}>
+          <Link to="/recipes" search={previous => ({ dietary: previous.dietary })} aria-current={starter ? undefined : "page"}>
             My recipes
           </Link>
         </Button>
         <Button asChild variant={starter ? "default" : "outline"} className="h-10">
-          <Link to="/recipes" search={{ view: "starter" }} aria-current={starter ? "page" : undefined}>
+          <Link to="/recipes" search={previous => ({ dietary: previous.dietary, view: "starter" })} aria-current={starter ? "page" : undefined}>
             Starter recipes
           </Link>
         </Button>

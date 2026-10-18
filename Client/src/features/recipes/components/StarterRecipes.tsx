@@ -5,25 +5,22 @@ import { Pagination } from "@/components/Pagination";
 import { SearchInput } from "@/components/SearchInput";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { usePreference } from "@/features/preferences";
 import type { SampleRecipeResponse } from "@/lib/api/generated";
 import { humanize } from "@/lib/enums";
 import { problemMessages } from "@/lib/problem";
 import { cn } from "@/lib/utils";
+import { useDietaryFilter } from "../hooks/useDietaryFilter";
 import { useImportSampleRecipe } from "../hooks/useImportSampleRecipe";
 import { useSampleRecipes } from "../hooks/useSampleRecipes";
+import { DietaryFilter } from "./DietaryFilter";
 
 const PAGE_SIZE = 10;
 
 export function StarterRecipes() {
   const [name, setName] = useState<string | undefined>();
   const [page, setPage] = useState(1);
-  const preference = usePreference();
-  const dietary = preference.data?.dietary ?? [];
-  const { data, isPending, isError, isPlaceholderData, refetch } = useSampleRecipes(
-    { name, dietary, page, pageSize: PAGE_SIZE },
-    { enabled: preference.isSuccess },
-  );
+  const { selected: dietary, select, ready } = useDietaryFilter();
+  const { data, isPending, isError, isPlaceholderData, refetch } = useSampleRecipes({ name, dietary, page, pageSize: PAGE_SIZE }, { enabled: ready });
 
   return (
     <section aria-labelledby="starter-recipes" className="space-y-4">
@@ -31,12 +28,16 @@ export function StarterRecipes() {
         <h2 id="starter-recipes" className="text-xl">
           Starter recipes
         </h2>
-        <p className="text-muted-foreground">
-          {dietary.length > 0
-            ? `Showing recipes that are ${dietary.map(requirement => humanize(requirement).toLowerCase()).join(" and ")}. You can change this under Preferences.`
-            : "Showing all of our starter recipes. Set your dietary preferences to see just the ones that suit you."}
-        </p>
+        <p className="text-muted-foreground">Ready-made recipes you can add to your own. We start with ones that suit your dietary preferences; use the tags to change that.</p>
       </div>
+
+      <DietaryFilter
+        selected={dietary}
+        onChange={selected => {
+          select(selected);
+          setPage(1);
+        }}
+      />
 
       <SearchInput
         value={name ?? ""}
@@ -48,7 +49,7 @@ export function StarterRecipes() {
         placeholder="Search starter recipes"
       />
 
-      {(isPending || preference.isPending) && <p className="text-muted-foreground">Loading starter recipes…</p>}
+      {isPending && <p className="text-muted-foreground">Loading starter recipes…</p>}
 
       {isError && (
         <div className="space-y-3 rounded-xl border bg-card p-4">

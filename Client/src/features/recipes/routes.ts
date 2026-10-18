@@ -11,7 +11,8 @@ export const recipesRoute = createRoute({
   validateSearch: (search: Record<string, unknown>): { q?: string; page?: number; dietary?: DietaryRequirement[]; view?: "starter" } => ({
     q: parseText(search.q),
     page: parsePage(search.page),
-    dietary: parseList(search.dietary, DIETARY_REQUIREMENTS),
+    // Absent means "not chosen yet" (use the saved preference); an empty list means the user chose All.
+    dietary: Array.isArray(search.dietary) ? (parseList(search.dietary, DIETARY_REQUIREMENTS) ?? []) : undefined,
     view: search.view === "starter" ? "starter" : undefined,
   }),
   component: RecipesPage,
