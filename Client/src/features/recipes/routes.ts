@@ -8,10 +8,11 @@ import { RecipesPage } from "./pages/RecipesPage";
 export const recipesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/recipes",
-  validateSearch: (search: Record<string, unknown>): { q?: string; page?: number; dietary?: DietaryRequirement[] } => ({
+  validateSearch: (search: Record<string, unknown>): { q?: string; page?: number; dietary?: DietaryRequirement[]; view?: "starter" } => ({
     q: parseText(search.q),
     page: parsePage(search.page),
     dietary: parseList(search.dietary, DIETARY_REQUIREMENTS),
+    view: search.view === "starter" ? "starter" : undefined,
   }),
   component: RecipesPage,
 });

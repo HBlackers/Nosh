@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteIngredientsByIdData, DeleteIngredientsByIdErrors, DeleteIngredientsByIdResponses, DeleteInventoryByIdData, DeleteInventoryByIdErrors, DeleteInventoryByIdResponses, DeleteRecipesByIdData, DeleteRecipesByIdErrors, DeleteRecipesByIdResponses, DeleteScheduleEventsByIdData, DeleteScheduleEventsByIdErrors, DeleteScheduleEventsByIdResponses, DeleteSchedulesByIdData, DeleteSchedulesByIdErrors, DeleteSchedulesByIdResponses, GetIngredientsByIdData, GetIngredientsByIdErrors, GetIngredientsByIdResponses, GetIngredientsData, GetIngredientsErrors, GetIngredientsResponses, GetInventoryByIdData, GetInventoryByIdErrors, GetInventoryByIdResponses, GetInventoryData, GetInventoryErrors, GetInventoryResponses, GetRecipesByIdData, GetRecipesByIdErrors, GetRecipesByIdResponses, GetRecipesData, GetRecipesErrors, GetRecipesResponses, GetRecipesSamplesData, GetRecipesSamplesErrors, GetRecipesSamplesResponses, GetScheduleEventsByIdData, GetScheduleEventsByIdErrors, GetScheduleEventsByIdResponses, GetScheduleEventsData, GetScheduleEventsErrors, GetScheduleEventsResponses, GetSchedulesByIdData, GetSchedulesByIdErrors, GetSchedulesByIdResponses, GetSchedulesData, GetSchedulesErrors, GetSchedulesResponses, GetShoppingListData, GetShoppingListErrors, GetShoppingListResponses, PostIngredientsData, PostIngredientsErrors, PostIngredientsResponses, PostInventoryData, PostInventoryErrors, PostInventoryResponses, PostRecipesData, PostRecipesErrors, PostRecipesResponses, PostScheduleEventsData, PostScheduleEventsErrors, PostScheduleEventsResponses, PostSchedulesData, PostSchedulesErrors, PostSchedulesResponses, PutIngredientsByIdData, PutIngredientsByIdErrors, PutIngredientsByIdResponses, PutInventoryByIdData, PutInventoryByIdErrors, PutInventoryByIdResponses, PutRecipesByIdData, PutRecipesByIdErrors, PutRecipesByIdResponses, PutScheduleEventsByIdData, PutScheduleEventsByIdErrors, PutScheduleEventsByIdResponses, PutSchedulesByIdData, PutSchedulesByIdErrors, PutSchedulesByIdResponses } from './types.gen';
+import type { DeleteIngredientsByIdData, DeleteIngredientsByIdErrors, DeleteIngredientsByIdResponses, DeleteInventoryByIdData, DeleteInventoryByIdErrors, DeleteInventoryByIdResponses, DeletePreferencesByIdData, DeletePreferencesByIdErrors, DeletePreferencesByIdResponses, DeleteRecipesByIdData, DeleteRecipesByIdErrors, DeleteRecipesByIdResponses, DeleteScheduleEventsByIdData, DeleteScheduleEventsByIdErrors, DeleteScheduleEventsByIdResponses, DeleteSchedulesByIdData, DeleteSchedulesByIdErrors, DeleteSchedulesByIdResponses, GetIngredientsByIdData, GetIngredientsByIdErrors, GetIngredientsByIdResponses, GetIngredientsData, GetIngredientsErrors, GetIngredientsResponses, GetInventoryByIdData, GetInventoryByIdErrors, GetInventoryByIdResponses, GetInventoryData, GetInventoryErrors, GetInventoryResponses, GetPreferencesByIdData, GetPreferencesByIdErrors, GetPreferencesByIdResponses, GetPreferencesData, GetPreferencesErrors, GetPreferencesResponses, GetRecipesByIdData, GetRecipesByIdErrors, GetRecipesByIdResponses, GetRecipesData, GetRecipesErrors, GetRecipesResponses, GetRecipesSamplesData, GetRecipesSamplesErrors, GetRecipesSamplesResponses, GetScheduleEventsByIdData, GetScheduleEventsByIdErrors, GetScheduleEventsByIdResponses, GetScheduleEventsData, GetScheduleEventsErrors, GetScheduleEventsResponses, GetSchedulesByIdData, GetSchedulesByIdErrors, GetSchedulesByIdResponses, GetSchedulesData, GetSchedulesErrors, GetSchedulesResponses, GetShoppingListData, GetShoppingListErrors, GetShoppingListResponses, PostIngredientsData, PostIngredientsErrors, PostIngredientsResponses, PostInventoryData, PostInventoryErrors, PostInventoryResponses, PostPreferencesData, PostPreferencesErrors, PostPreferencesResponses, PostRecipesData, PostRecipesErrors, PostRecipesResponses, PostScheduleEventsData, PostScheduleEventsErrors, PostScheduleEventsResponses, PostSchedulesData, PostSchedulesErrors, PostSchedulesResponses, PutIngredientsByIdData, PutIngredientsByIdErrors, PutIngredientsByIdResponses, PutInventoryByIdData, PutInventoryByIdErrors, PutInventoryByIdResponses, PutPreferencesByIdData, PutPreferencesByIdErrors, PutPreferencesByIdResponses, PutRecipesByIdData, PutRecipesByIdErrors, PutRecipesByIdResponses, PutScheduleEventsByIdData, PutScheduleEventsByIdErrors, PutScheduleEventsByIdResponses, PutSchedulesByIdData, PutSchedulesByIdErrors, PutSchedulesByIdResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -141,3 +141,27 @@ export const putSchedulesById = <ThrowOnError extends boolean = false>(options: 
 });
 
 export const getShoppingList = <ThrowOnError extends boolean = false>(options?: Options<GetShoppingListData, ThrowOnError>): RequestResult<GetShoppingListResponses, GetShoppingListErrors, ThrowOnError> => (options?.client ?? client).get<GetShoppingListResponses, GetShoppingListErrors, ThrowOnError>({ url: '/shopping-list', ...options });
+
+export const getPreferences = <ThrowOnError extends boolean = false>(options?: Options<GetPreferencesData, ThrowOnError>): RequestResult<GetPreferencesResponses, GetPreferencesErrors, ThrowOnError> => (options?.client ?? client).get<GetPreferencesResponses, GetPreferencesErrors, ThrowOnError>({ url: '/preferences', ...options });
+
+export const postPreferences = <ThrowOnError extends boolean = false>(options: Options<PostPreferencesData, ThrowOnError>): RequestResult<PostPreferencesResponses, PostPreferencesErrors, ThrowOnError> => (options.client ?? client).post<PostPreferencesResponses, PostPreferencesErrors, ThrowOnError>({
+    url: '/preferences',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+export const deletePreferencesById = <ThrowOnError extends boolean = false>(options: Options<DeletePreferencesByIdData, ThrowOnError>): RequestResult<DeletePreferencesByIdResponses, DeletePreferencesByIdErrors, ThrowOnError> => (options.client ?? client).delete<DeletePreferencesByIdResponses, DeletePreferencesByIdErrors, ThrowOnError>({ url: '/preferences/{id}', ...options });
+
+export const getPreferencesById = <ThrowOnError extends boolean = false>(options: Options<GetPreferencesByIdData, ThrowOnError>): RequestResult<GetPreferencesByIdResponses, GetPreferencesByIdErrors, ThrowOnError> => (options.client ?? client).get<GetPreferencesByIdResponses, GetPreferencesByIdErrors, ThrowOnError>({ url: '/preferences/{id}', ...options });
+
+export const putPreferencesById = <ThrowOnError extends boolean = false>(options: Options<PutPreferencesByIdData, ThrowOnError>): RequestResult<PutPreferencesByIdResponses, PutPreferencesByIdErrors, ThrowOnError> => (options.client ?? client).put<PutPreferencesByIdResponses, PutPreferencesByIdErrors, ThrowOnError>({
+    url: '/preferences/{id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});

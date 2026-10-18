@@ -42,6 +42,10 @@ export type CreateScheduleRequest = {
     maxOccurrences?: null | number | string;
 };
 
+export type CreateUserPreferenceRequest = {
+    dietary?: Array<DietaryRequirement>;
+};
+
 export type Cuisine = 'British' | 'Mediterranean' | 'Indian' | 'Italian' | 'Mexican' | 'Chinese' | 'Thai';
 
 export type DayOfWeek = 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';
@@ -123,6 +127,14 @@ export type PagedResponseOfScheduleEventResponse = {
 
 export type PagedResponseOfScheduleOccurrenceResponse = {
     items: Array<ScheduleOccurrenceResponse>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+    totalPages?: number | string;
+};
+
+export type PagedResponseOfUserPreferenceResponse = {
+    items: Array<UserPreferenceResponse>;
     page: number | string;
     pageSize: number | string;
     totalCount: number | string;
@@ -295,6 +307,15 @@ export type UpdateScheduleRequest = {
     daysOfWeek?: Array<DayOfWeek>;
     endDate?: null | string;
     maxOccurrences?: null | number | string;
+};
+
+export type UpdateUserPreferenceRequest = {
+    dietary?: Array<DietaryRequirement>;
+};
+
+export type UserPreferenceResponse = {
+    id: string;
+    dietary: Array<DietaryRequirement>;
 };
 
 export type ValidationProblemDetails = {
@@ -1064,3 +1085,141 @@ export type GetShoppingListResponses = {
 };
 
 export type GetShoppingListResponse = GetShoppingListResponses[keyof GetShoppingListResponses];
+
+export type GetPreferencesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        Page?: number | string;
+        PageSize?: number | string;
+    };
+    url: '/preferences';
+};
+
+export type GetPreferencesErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type GetPreferencesError = GetPreferencesErrors[keyof GetPreferencesErrors];
+
+export type GetPreferencesResponses = {
+    /**
+     * OK
+     */
+    200: PagedResponseOfUserPreferenceResponse;
+};
+
+export type GetPreferencesResponse = GetPreferencesResponses[keyof GetPreferencesResponses];
+
+export type PostPreferencesData = {
+    body: CreateUserPreferenceRequest;
+    path?: never;
+    query?: never;
+    url: '/preferences';
+};
+
+export type PostPreferencesErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type PostPreferencesError = PostPreferencesErrors[keyof PostPreferencesErrors];
+
+export type PostPreferencesResponses = {
+    /**
+     * Created
+     */
+    201: UserPreferenceResponse;
+};
+
+export type PostPreferencesResponse = PostPreferencesResponses[keyof PostPreferencesResponses];
+
+export type DeletePreferencesByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/preferences/{id}';
+};
+
+export type DeletePreferencesByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type DeletePreferencesByIdError = DeletePreferencesByIdErrors[keyof DeletePreferencesByIdErrors];
+
+export type DeletePreferencesByIdResponses = {
+    /**
+     * No Content
+     */
+    204: void;
+};
+
+export type DeletePreferencesByIdResponse = DeletePreferencesByIdResponses[keyof DeletePreferencesByIdResponses];
+
+export type GetPreferencesByIdData = {
+    body?: never;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/preferences/{id}';
+};
+
+export type GetPreferencesByIdErrors = {
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type GetPreferencesByIdError = GetPreferencesByIdErrors[keyof GetPreferencesByIdErrors];
+
+export type GetPreferencesByIdResponses = {
+    /**
+     * OK
+     */
+    200: UserPreferenceResponse;
+};
+
+export type GetPreferencesByIdResponse = GetPreferencesByIdResponses[keyof GetPreferencesByIdResponses];
+
+export type PutPreferencesByIdData = {
+    body: UpdateUserPreferenceRequest;
+    path: {
+        id: string;
+    };
+    query?: never;
+    url: '/preferences/{id}';
+};
+
+export type PutPreferencesByIdErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+    /**
+     * Not Found
+     */
+    404: ProblemDetails;
+};
+
+export type PutPreferencesByIdError = PutPreferencesByIdErrors[keyof PutPreferencesByIdErrors];
+
+export type PutPreferencesByIdResponses = {
+    /**
+     * OK
+     */
+    200: UserPreferenceResponse;
+};
+
+export type PutPreferencesByIdResponse = PutPreferencesByIdResponses[keyof PutPreferencesByIdResponses];

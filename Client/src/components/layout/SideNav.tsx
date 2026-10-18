@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { BookOpen, CalendarDays, Carrot, Package, ShoppingBasket } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
@@ -10,9 +11,9 @@ const items = [
   { label: "Inventory", icon: Package, to: "/inventory" },
 ] as const;
 
-export function SideNav() {
+export function SideNav({ footer }: { footer?: ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 p-4 lg:gap-6 lg:p-6">
+    <div className="flex flex-col gap-3 p-4 lg:min-h-full lg:gap-6 lg:p-6">
       <Link to="/" aria-label="Nosh home" className="self-start">
         <Logo variant="full" className="w-28 lg:w-44" />
       </Link>
@@ -33,6 +34,8 @@ export function SideNav() {
           ))}
         </ul>
       </nav>
+
+      {footer && <div className="lg:mt-auto">{footer}</div>}
     </div>
   );
 }
