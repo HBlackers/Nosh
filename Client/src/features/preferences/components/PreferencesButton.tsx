@@ -13,9 +13,9 @@ export function PreferencesButton() {
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left font-semibold text-cloud-grey hover:bg-charcoal-raised hover:text-nosh-green focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+          className="flex min-h-14 w-full items-center gap-4 rounded-lg px-3 py-2.5 text-left text-xl font-semibold text-cloud-grey lg:min-h-11 lg:gap-3 lg:text-base hover:bg-charcoal-raised hover:text-nosh-green focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
         >
-          <SlidersHorizontal className="size-5" aria-hidden="true" />
+          <SlidersHorizontal className="size-6 lg:size-5" aria-hidden="true" />
           Preferences
         </button>
       </DialogTrigger>
