@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Carrot } from "lucide-react";
+import { BookOpen, CalendarDays, Carrot, ShoppingBasket } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 const items = [
   { label: "Calendar", icon: CalendarDays, to: "/" },
+  { label: "Shopping list", icon: ShoppingBasket, to: "/shopping-list" },
   { label: "Recipes", icon: BookOpen, to: "/recipes" },
   { label: "Ingredients", icon: Carrot, to: "/ingredients" },
 ] as const;

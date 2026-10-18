@@ -34,3 +34,15 @@ export function formatRange(start: Date, end: Date): string {
 export const formatWeekday = (date: Date) => new Intl.DateTimeFormat("en-GB", { weekday: "short" }).format(date);
 
 export const formatWeekdayLong = (date: Date) => new Intl.DateTimeFormat("en-GB", { weekday: "long", day: "numeric", month: "long" }).format(date);
+
+export function resolveWeek(week: ISODate | undefined, today = new Date()) {
+  const currentWeekStart = startOfWeek(today);
+  const weekStart = week ? startOfWeek(parseISODate(week)) : currentWeekStart;
+
+  return {
+    today,
+    weekStart,
+    weekEnd: addDays(weekStart, 6),
+    isCurrentWeek: toISODate(weekStart) === toISODate(currentWeekStart),
+  };
+}
