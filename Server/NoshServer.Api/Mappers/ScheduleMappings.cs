@@ -1,5 +1,7 @@
+using NoshServer.Api.Contracts.Common;
 using NoshServer.Api.Contracts.Schedules.Requests;
 using NoshServer.Api.Contracts.Schedules.Responses;
+using NoshServer.Application.Models.Common;
 using NoshServer.Application.Models.Schedules;
 using NoshServer.Application.Models.Schedules.Enums;
 
@@ -59,7 +61,41 @@ public static class ScheduleMappings
             occurrence.Date,
             occurrence.Schedule.MealType,
             occurrence.Schedule.Frequency != RecurrenceFrequency.None,
-            occurrence.Schedule.ToRecipeResponse());
+            occurrence.Schedule.ToRecipeResponse(),
+            occurrence.Event?.ToResponse(),
+            occurrence.Availability?.ToResponse());
+    }
+
+    public static ScheduleEvent ToModel(this CreateScheduleEventRequest request)
+    {
+        return new ScheduleEvent { ScheduleId = request.ScheduleId, Date = request.Date, Status = request.Status };
+    }
+
+    /// <summary>
+    /// Applies the request to an existing event. Its id, schedule, date and timestamps are left as they are.
+    /// </summary>
+    public static void ApplyTo(this UpdateScheduleEventRequest request, ScheduleEvent scheduleEvent)
+    {
+        scheduleEvent.Status = request.Status;
+    }
+
+    public static ScheduleEventResponse ToResponse(this ScheduleEvent scheduleEvent)
+    {
+        return new ScheduleEventResponse(scheduleEvent.Id, scheduleEvent.ScheduleId, scheduleEvent.Date, scheduleEvent.Status);
+    }
+
+    private static MealAvailabilityResponse ToResponse(this MealAvailability availability)
+    {
+        return new MealAvailabilityResponse(
+            availability.Status,
+            availability.IngredientsTotal,
+            availability.IngredientsCovered,
+            [.. availability.Lacking.Select(l => new LackingIngredientResponse(l.IngredientId, l.IngredientName, l.Needed?.ToResponse(), l.Available?.ToResponse()))]);
+    }
+
+    private static QuantityResponse ToResponse(this Quantity quantity)
+    {
+        return new QuantityResponse(quantity.Amount, quantity.Unit);
     }
 
     private static ScheduleRecipeResponse ToRecipeResponse(this RecipeSchedule schedule)

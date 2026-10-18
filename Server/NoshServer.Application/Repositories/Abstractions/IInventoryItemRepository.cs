@@ -19,6 +19,11 @@ public interface IInventoryItemRepository : IBaseRepository<InventoryItem>
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets every inventory item with its ingredient.
+    /// </summary>
+    Task<List<InventoryItem>> GetAllWithIngredientAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets an inventory item with its ingredient, or null if it does not exist.
     /// </summary>
     Task<InventoryItem?> GetWithIngredientAsync(Guid id, CancellationToken cancellationToken = default);

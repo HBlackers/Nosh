@@ -251,6 +251,45 @@ namespace NoshServer.Application.Context.Migrations
                     b.ToTable("RecipeSchedules");
                 });
 
+            modelBuilder.Entity("NoshServer.Application.Models.Schedules.ScheduleEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Date");
+
+                    b.HasIndex("ScheduleId", "Date")
+                        .IsUnique()
+                        .HasFilter("\"IsDeleted\" = false");
+
+                    b.ToTable("ScheduleEvents");
+                });
+
             modelBuilder.Entity("NoshServer.Application.Models.Inventory.InventoryItem", b =>
                 {
                     b.HasOne("NoshServer.Application.Models.Ingredients.Ingredient", "Ingredient")
@@ -290,6 +329,17 @@ namespace NoshServer.Application.Context.Migrations
                         .IsRequired();
 
                     b.Navigation("Recipe");
+                });
+
+            modelBuilder.Entity("NoshServer.Application.Models.Schedules.ScheduleEvent", b =>
+                {
+                    b.HasOne("NoshServer.Application.Models.Schedules.RecipeSchedule", "Schedule")
+                        .WithMany()
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Schedule");
                 });
 
             modelBuilder.Entity("NoshServer.Application.Models.Ingredients.Ingredient", b =>

@@ -30,6 +30,12 @@ public class InventoryItemRepository(NoshContext context) : BaseRepository<Inven
     }
 
     /// <inheritdoc />
+    public Task<List<InventoryItem>> GetAllWithIngredientAsync(CancellationToken cancellationToken = default)
+    {
+        return GetAllAsync(include: query => query.Include(i => i.Ingredient), cancellationToken: cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<InventoryItem?> GetWithIngredientAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return GetByIdAsync(id, include: query => query.Include(i => i.Ingredient), cancellationToken: cancellationToken);

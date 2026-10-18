@@ -102,9 +102,30 @@ Dependencies only point down this table. `Application` never references `Api` or
 
 - A `RecipeSchedule` is one row: a recipe, a start date, a meal and an optional recurrence rule (`Frequency` None/Daily/Weekly/Monthly, `Interval`, `DaysOfWeek`, and an end by `EndDate` or `MaxOccurrences`, or neither). **Occurrences are not stored**: `ScheduleExpander` (`Application/Helpers`) works the dates out from the rule when the calendar is read. A one-off is `Frequency = None`.
 - Dates are `DateOnly` (calendar days, no time zones). Weeks start on Monday and "every N weeks" counts from the week the schedule starts in. Monthly repeats on the start date's day of the month, using the last day when the month is shorter. The end date and occurrence limit are counted from the start date, not from the requested range.
-- `GET /schedules?from=&to=&page=&pageSize=` returns a `PagedResponse` of occurrences (date, meal, recurring flag and a light recipe summary), ordered by date then meal. The range is required and limited to 366 days. The full recipe comes from `GET /recipes/{id}`.
-- Changes always apply to the whole schedule (no skipping or moving single occurrences). To change from a date onward, end the schedule and create a new one.
+- `GET /schedules?from=&to=&page=&pageSize=` returns a `PagedResponse` of occurrences (date, meal, recurring flag, a light recipe summary, its `Event` and its `Availability`), ordered by date then meal. The range is required and limited to 366 days. The full recipe comes from `GET /recipes/{id}`.
+- Changes to a schedule always apply to the whole schedule (no moving single occurrences). To change from a date onward, end the schedule and create a new one. Completing or skipping a single occurrence is a schedule event (below).
 - Deleting a recipe soft deletes its schedules too (in the same transaction as its ingredient lines, in `RecipeRepository.DeleteAsync`). Schedules aren't tied to a user yet.
+
+### Schedule events (completing and skipping a meal)
+
+- A `ScheduleEvent` records that one occurrence of a schedule (`ScheduleId` + `Date`) was `Completed` or `Skipped`. A schedule has many events, at most one per date (unique index, soft-delete aware). It has its own controller, `ScheduleEventsController` (`/schedule-events`: list with optional `scheduleId`/`from`/`to`, get, create, update status, delete). The date must be one the schedule falls on.
+- **Completing takes the recipe's ingredients out of stock** in the same transaction as the event (`IUnitOfWork.ExecuteAsync`, `ScheduleEventService`). It takes as much as there is of each ingredient and removes an item that is used up. Skipping leaves stock alone. Deleting an event, or changing completed to skipped, does **not** put stock back. Changing skipped to completed takes the stock then.
+- Occurrences with an event are returned with `Event` set and no `Availability`, and drop out of the shopping list.
+
+### Stock availability (calendar status)
+
+- `StockAllocator` (`Application/Helpers`) works on an in-memory copy of the inventory and hands it to meals one at a time, so a later meal only sees what earlier ones left. `GET /schedules` runs it over the pending occurrences in date then meal order. The range only: stock used by meals before `from` isn't counted.
+- `MealAvailability.Status`: `Ready` (every ingredient line covered), `Partial` (some stock of what is needed), `Missing` (none). `Lacking` lists the lines not fully covered. A line without an amount is covered by any stock of the ingredient and takes none. A line whose stock unit can't be converted counts as lacking.
+- Unit conversion rules are in `MeasurementUnitExtensions` (`CanConvertTo`, `Convert`, `Smaller`): mass and volume convert within their category, a count unit only matches itself, null matches only null. Combine and compare quantities in the smaller unit.
+
+### Inventory
+
+- `InventoryItem`: how much of an ingredient is in stock, at most one per ingredient (unique index), quantity above zero, a null unit meaning a plain count. `POST /inventory` adds stock and merges into the existing item (converting units, moving to the smaller one, `400` if the units can't be combined); `PUT` sets the quantity; `DELETE` removes the item. `GET /inventory` is paged and searched by ingredient name.
+
+### Shopping list
+
+- `GET /shopping-list?from=&to=` (limited to 31 days) works out what the pending occurrences in the range need and what is still to buy. It isn't stored. Recurring schedules count once per date; completed and skipped occurrences are left out.
+- Amounts that can be converted are summed, so an ingredient measured in grams and as a plain count gives two items. Each item has `Needed`, `InStock`, `ToBuy` and a `Status` of `ToBuy`, `Covered` or `UnitMismatch`. Lines without an amount only make an item when no recipe gives an amount. `UnplannedStock` lists stock that no planned recipe uses.
 
 ### Sample recipes (configuration data)
 
@@ -136,3 +157,4 @@ It only sees exceptions thrown from controller actions and other MVC filters, no
 - Secrets and connection strings come from configuration (`ConnectionStrings:Nosh`), never from code. `appsettings.Development.json` holds local-only defaults.
 - Packages restore from nuget.org; the private `redev` feed is not reachable from every machine.
 - Dependency injection is registered in `Program.cs` (`NoshContext`, repositories, services; validators by assembly scan). Register each new repository and service there.
+- **Several repositories in one step:** a service that must change more than one repository's data all-or-nothing uses `IUnitOfWork.ExecuteAsync` (a transaction on the shared `NoshContext`).

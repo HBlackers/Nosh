@@ -9,7 +9,12 @@ using NoshServer.Application.Services.Abstractions;
 namespace NoshServer.Application.Services;
 
 /// <inheritdoc cref="IRecipeScheduleService"/>
-public class RecipeScheduleService(IRecipeScheduleRepository scheduleRepository, IValidator<RecipeSchedule> validator) : IRecipeScheduleService
+public class RecipeScheduleService(
+    IRecipeScheduleRepository scheduleRepository,
+    IScheduleEventRepository scheduleEventRepository,
+    IRecipeRepository recipeRepository,
+    IInventoryItemRepository inventoryItemRepository,
+    IValidator<RecipeSchedule> validator) : IRecipeScheduleService
 {
     /// <inheritdoc />
     public async Task<PagedResult<ScheduleOccurrence>> GetOccurrencesAsync(
@@ -20,14 +25,26 @@ public class RecipeScheduleService(IRecipeScheduleRepository scheduleRepository,
         CancellationToken cancellationToken = default)
     {
         var schedules = await scheduleRepository.GetOverlappingAsync(from, to, cancellationToken);
+        var events = (await scheduleEventRepository.GetInRangeAsync(from, to, cancellationToken))
+            .ToDictionary(e => (e.ScheduleId, e.Date));
+
+        var dated = schedules
+            .SelectMany(schedule => ScheduleExpander.Expand(schedule, from, to).Select(date => (Date: date, Schedule: schedule)))
+            .OrderBy(o => o.Date)
+            .ThenBy(o => o.Schedule.MealType)
+            .ToList();
+
+        var availability = await GetAvailabilityAsync(dated.Where(o => !events.ContainsKey((o.Schedule.Id, o.Date))).ToList(), cancellationToken);
 
         List<ScheduleOccurrence> occurrences =
         [
-            .. schedules
-                .SelectMany(schedule => ScheduleExpander.Expand(schedule, from, to)
-                    .Select(date => new ScheduleOccurrence { Date = date, Schedule = schedule }))
-                .OrderBy(o => o.Date)
-                .ThenBy(o => o.Schedule.MealType),
+            .. dated.Select(o => new ScheduleOccurrence
+            {
+                Date = o.Date,
+                Schedule = o.Schedule,
+                Event = events.GetValueOrDefault((o.Schedule.Id, o.Date)),
+                Availability = availability.GetValueOrDefault((o.Schedule.Id, o.Date)),
+            }),
         ];
 
         return new PagedResult<ScheduleOccurrence>
@@ -72,6 +89,32 @@ public class RecipeScheduleService(IRecipeScheduleRepository scheduleRepository,
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
         await scheduleRepository.DeleteAsync(id, cancellationToken);
+    }
+
+    // Meals are handed the stock in date order, so a later meal only sees what the earlier ones left.
+    private async Task<Dictionary<(Guid ScheduleId, DateOnly Date), MealAvailability>> GetAvailabilityAsync(
+        List<(DateOnly Date, RecipeSchedule Schedule)> pending,
+        CancellationToken cancellationToken)
+    {
+        if (pending.Count == 0)
+        {
+            return [];
+        }
+
+        var recipes = (await recipeRepository.GetByIdsAsync([.. pending.Select(o => o.Schedule.RecipeId).Distinct()], cancellationToken))
+            .ToDictionary(r => r.Id);
+        var allocator = new StockAllocator(await inventoryItemRepository.GetAllWithIngredientAsync(cancellationToken));
+
+        Dictionary<(Guid ScheduleId, DateOnly Date), MealAvailability> availability = [];
+        foreach (var (date, schedule) in pending)
+        {
+            if (recipes.TryGetValue(schedule.RecipeId, out var recipe))
+            {
+                availability[(schedule.Id, date)] = allocator.Take(recipe);
+            }
+        }
+
+        return availability;
     }
 
     // A one-off has no recurrence settings; a repeating schedule only keeps the days that apply to its frequency.

@@ -40,6 +40,12 @@ public class RecipeRepository(NoshContext context) : BaseRepository<Recipe>(cont
     }
 
     /// <inheritdoc />
+    public Task<List<Recipe>> GetByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        return GetAllAsync(r => ids.Contains(r.Id), WithIngredients, cancellationToken);
+    }
+
+    /// <inheritdoc />
     public Task<bool> ExistsBySlugAsync(string slug, Guid? excludeId = null, CancellationToken cancellationToken = default)
     {
         return AnyAsync(r => r.Slug == slug && (excludeId == null || r.Id != excludeId), cancellationToken);

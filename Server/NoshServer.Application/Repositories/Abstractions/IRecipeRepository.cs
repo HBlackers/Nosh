@@ -21,6 +21,11 @@ public interface IRecipeRepository : IBaseRepository<Recipe>
         CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets the non-deleted recipes with the given identifiers, each with its ingredient lines.
+    /// </summary>
+    Task<List<Recipe>> GetByIdsAsync(IReadOnlyCollection<Guid> ids, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Returns whether a non-deleted recipe with this slug exists, optionally excluding one recipe.
     /// </summary>
     Task<bool> ExistsBySlugAsync(string slug, Guid? excludeId = null, CancellationToken cancellationToken = default);

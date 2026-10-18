@@ -37,6 +37,11 @@ public sealed class NoshContext : DbContext
     public DbSet<RecipeSchedule> RecipeSchedules => Set<RecipeSchedule>();
 
     /// <summary>
+    /// Scheduled recipes that were completed or skipped on a date.
+    /// </summary>
+    public DbSet<ScheduleEvent> ScheduleEvents => Set<ScheduleEvent>();
+
+    /// <summary>
     /// Ingredients in stock.
     /// </summary>
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
