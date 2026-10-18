@@ -133,6 +133,14 @@ export type PagedResponseOfScheduleOccurrenceResponse = {
     totalPages?: number | string;
 };
 
+export type PagedResponseOfScheduleResponse = {
+    items: Array<ScheduleResponse>;
+    page: number | string;
+    pageSize: number | string;
+    totalCount: number | string;
+    totalPages?: number | string;
+};
+
 export type PagedResponseOfUserPreferenceResponse = {
     items: Array<UserPreferenceResponse>;
     page: number | string;
@@ -972,6 +980,36 @@ export type PostSchedulesResponses = {
 };
 
 export type PostSchedulesResponse = PostSchedulesResponses[keyof PostSchedulesResponses];
+
+export type GetRecipesByRecipeIdSchedulesData = {
+    body?: never;
+    path: {
+        recipeId: string;
+    };
+    query?: {
+        Page?: number | string;
+        PageSize?: number | string;
+    };
+    url: '/recipes/{recipeId}/schedules';
+};
+
+export type GetRecipesByRecipeIdSchedulesErrors = {
+    /**
+     * Bad Request
+     */
+    400: ValidationProblemDetails;
+};
+
+export type GetRecipesByRecipeIdSchedulesError = GetRecipesByRecipeIdSchedulesErrors[keyof GetRecipesByRecipeIdSchedulesErrors];
+
+export type GetRecipesByRecipeIdSchedulesResponses = {
+    /**
+     * OK
+     */
+    200: PagedResponseOfScheduleResponse;
+};
+
+export type GetRecipesByRecipeIdSchedulesResponse = GetRecipesByRecipeIdSchedulesResponses[keyof GetRecipesByRecipeIdSchedulesResponses];
 
 export type DeleteSchedulesByIdData = {
     body?: never;

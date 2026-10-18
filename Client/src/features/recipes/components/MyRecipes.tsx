@@ -1,13 +1,15 @@
 import { getRouteApi } from "@tanstack/react-router";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Pagination } from "@/components/Pagination";
 import { SearchInput } from "@/components/SearchInput";
 import { Button } from "@/components/ui/button";
+import type { RecipeSummaryResponse } from "@/lib/api/generated";
 import { cn } from "@/lib/utils";
 import { useDietaryFilter } from "../hooks/useDietaryFilter";
 import { useRecipes } from "../hooks/useRecipes";
 import { CreateRecipeDialog } from "./CreateRecipeDialog";
 import { DietaryFilter } from "./DietaryFilter";
+import { RecipeDialog } from "./RecipeDialog";
 import { RecipesTable } from "./RecipesTable";
 import { StarterRecipes } from "./StarterRecipes";
 
@@ -20,6 +22,7 @@ export function MyRecipes() {
   const { selected: dietary, select, ready } = useDietaryFilter();
   const { data, isPending, isError, isPlaceholderData, refetch } = useRecipes({ name: q, dietary, page, pageSize: PAGE_SIZE }, { enabled: ready });
   const everything = useRecipes({ page: 1, pageSize: 1 });
+  const [viewing, setViewing] = useState<RecipeSummaryResponse | null>(null);
 
   const search = useCallback(
     (value: string) => void navigate({ search: previous => ({ ...previous, q: value || undefined, page: undefined }), replace: true }),
@@ -64,7 +67,7 @@ export function MyRecipes() {
         {data.items.length === 0 ? (
           <p className="text-muted-foreground">No recipes match. Try a different search, or change the dietary tags.</p>
         ) : (
-          <RecipesTable recipes={data.items} />
+          <RecipesTable recipes={data.items} onView={setViewing} />
         )}
         <Pagination
           page={page}
@@ -73,6 +76,8 @@ export function MyRecipes() {
           onPageChange={next => void navigate({ search: previous => ({ ...previous, page: next > 1 ? next : undefined }) })}
         />
       </div>
+
+      <RecipeDialog recipe={viewing} onClose={() => setViewing(null)} />
     </div>
   );
 }

@@ -18,7 +18,7 @@ export function ScheduleDialog({ trigger, defaults }: ScheduleDialogProps) {
       <DialogContent className="max-h-[90dvh]">
         <ScheduleForm
           defaults={defaults}
-          onCreated={date => {
+          onSaved={date => {
             setOpen(false);
             void navigate({ to: "/", search: { week: date } });
           }}

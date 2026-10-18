@@ -6,12 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RecipeCombobox, type RecipeOption } from "@/features/recipes";
-import type { DayOfWeek, MealType, RecurrenceFrequency } from "@/lib/api/generated";
+import type { DayOfWeek, MealType, RecurrenceFrequency, ScheduleResponse } from "@/lib/api/generated";
 import type { ISODate } from "@/lib/dates";
 import { MEAL_TYPES } from "@/lib/enums";
 import { problemMessages } from "@/lib/problem";
 import { cn } from "@/lib/utils";
 import { useCreateSchedule } from "../hooks/useCreateSchedule";
+import { useUpdateSchedule } from "../hooks/useUpdateSchedule";
 import { FREQUENCIES, WEEK_DAYS, dayOfWeekOf } from "../scheduleOptions";
 
 export type ScheduleDefaults = {
@@ -24,20 +25,29 @@ type EndMode = "never" | "date" | "count";
 
 type ScheduleFormProps = {
   defaults: ScheduleDefaults;
-  onCreated: (date: ISODate) => void;
+  // Changes an existing schedule instead of creating one.
+  schedule?: ScheduleResponse;
+  // Fixes the recipe, so the form has no recipe picker.
+  recipe?: RecipeOption;
+  onSaved: (date: ISODate) => void;
+  // Set when the form sits inside another dialog: it then has its own Cancel and heading instead of the dialog's.
+  onCancel?: () => void;
 };
 
-export function ScheduleForm({ defaults, onCreated }: ScheduleFormProps) {
-  const [recipe, setRecipe] = useState<RecipeOption | null>(null);
-  const [date, setDate] = useState<ISODate>(defaults.date);
-  const [mealType, setMealType] = useState<MealType | "">(defaults.mealType ?? "");
-  const [frequency, setFrequency] = useState<RecurrenceFrequency | "">(defaults.frequency ?? "");
-  const [interval, setInterval] = useState("1");
-  const [days, setDays] = useState<DayOfWeek[]>([]);
-  const [endMode, setEndMode] = useState<EndMode>("never");
-  const [endDate, setEndDate] = useState("");
-  const [count, setCount] = useState("4");
+export function ScheduleForm({ defaults, schedule, recipe: fixedRecipe, onSaved, onCancel }: ScheduleFormProps) {
+  const [recipe, setRecipe] = useState<RecipeOption | null>(fixedRecipe ?? (schedule ? { id: schedule.recipe.id, name: schedule.recipe.name } : null));
+  const [date, setDate] = useState<ISODate>(schedule?.startDate ?? defaults.date);
+  const [mealType, setMealType] = useState<MealType | "">(schedule?.mealType ?? defaults.mealType ?? "");
+  const [frequency, setFrequency] = useState<RecurrenceFrequency | "">(schedule?.frequency ?? defaults.frequency ?? "");
+  const [interval, setInterval] = useState(schedule ? String(Number(schedule.interval)) : "1");
+  const [days, setDays] = useState<DayOfWeek[]>(schedule?.daysOfWeek ?? []);
+  const [endMode, setEndMode] = useState<EndMode>(schedule?.endDate ? "date" : schedule?.maxOccurrences ? "count" : "never");
+  const [endDate, setEndDate] = useState(schedule?.endDate ?? "");
+  const [count, setCount] = useState(schedule?.maxOccurrences ? String(Number(schedule.maxOccurrences)) : "4");
   const create = useCreateSchedule();
+  const update = useUpdateSchedule();
+  const pending = create.isPending || update.isPending;
+  const error = create.isError ? create.error : update.isError ? update.error : null;
 
   const repeats = frequency !== "" && frequency !== "None";
   const unit = FREQUENCIES.find(option => option.value === frequency)?.unit ?? "";
@@ -67,32 +77,47 @@ export function ScheduleForm({ defaults, onCreated }: ScheduleFormProps) {
     if (recipe === null || mealType === "" || frequency === "" || !canSubmit) {
       return;
     }
-    create.mutate(
-      {
-        recipeId: recipe.id,
-        startDate: date,
-        mealType,
-        frequency,
-        interval: repeats ? Number(interval) : 1,
-        daysOfWeek: frequency === "Weekly" ? days : [],
-        endDate: repeats && endMode === "date" ? endDate : null,
-        maxOccurrences: repeats && endMode === "count" ? Number(count) : null,
-      },
-      { onSuccess: () => onCreated(date) },
-    );
+    const body = {
+      recipeId: recipe.id,
+      startDate: date,
+      mealType,
+      frequency,
+      interval: repeats ? Number(interval) : 1,
+      daysOfWeek: frequency === "Weekly" ? days : [],
+      endDate: repeats && endMode === "date" ? endDate : null,
+      maxOccurrences: repeats && endMode === "count" ? Number(count) : null,
+    };
+    const done = { onSuccess: () => onSaved(date) };
+    if (schedule) {
+      update.mutate({ id: schedule.id, body }, done);
+    } else {
+      create.mutate(body, done);
+    }
   };
+
+  const heading = schedule ? "Change schedule" : "Plan a recipe";
+  const intro = schedule ? "Changes apply to every date this schedule falls on." : "Choose a recipe, when to have it, and whether it repeats.";
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
-      <DialogHeader>
-        <DialogTitle>Plan a recipe</DialogTitle>
-        <DialogDescription>Choose a recipe, when to have it, and whether it repeats.</DialogDescription>
-      </DialogHeader>
+      {onCancel ? (
+        <div className="space-y-1">
+          <h3 className="text-lg">{heading}</h3>
+          <p className="text-muted-foreground">{intro}</p>
+        </div>
+      ) : (
+        <DialogHeader>
+          <DialogTitle>{heading}</DialogTitle>
+          <DialogDescription>{intro}</DialogDescription>
+        </DialogHeader>
+      )}
 
-      <div className="space-y-2">
-        <Label>Recipe</Label>
-        <RecipeCombobox value={recipe} onChange={setRecipe} label="Recipe" />
-      </div>
+      {!fixedRecipe && (
+        <div className="space-y-2">
+          <Label>Recipe</Label>
+          <RecipeCombobox value={recipe} onChange={setRecipe} label="Recipe" />
+        </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
@@ -191,16 +216,22 @@ export function ScheduleForm({ defaults, onCreated }: ScheduleFormProps) {
         </div>
       )}
 
-      {create.isError && <ErrorList messages={problemMessages(create.error)} />}
+      {error && <ErrorList messages={problemMessages(error)} />}
 
       <DialogFooter>
-        <DialogClose asChild>
-          <Button type="button" variant="outline" size="lg">
+        {onCancel ? (
+          <Button type="button" variant="outline" size="lg" onClick={onCancel}>
             Cancel
           </Button>
-        </DialogClose>
-        <Button type="submit" size="lg" disabled={!canSubmit || create.isPending}>
-          {create.isPending ? "Planning…" : "Plan it"}
+        ) : (
+          <DialogClose asChild>
+            <Button type="button" variant="outline" size="lg">
+              Cancel
+            </Button>
+          </DialogClose>
+        )}
+        <Button type="submit" size="lg" disabled={!canSubmit || pending}>
+          {pending ? "Saving…" : schedule ? "Save changes" : "Plan it"}
         </Button>
       </DialogFooter>
     </form>
