@@ -1,11 +1,12 @@
 import { Check, CircleX, SkipForward, Undo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ReadAloudControls } from "@/features/accessibility";
 import { StockQuickAdd } from "@/features/inventory";
 import { useRecipe } from "@/features/recipes";
 import type { LackingIngredientResponse, RecipeIngredientResponse } from "@/lib/api/generated";
 import { formatWeekdayLong, parseISODate } from "@/lib/dates";
-import { formatQuantity, toNumber } from "@/lib/quantity";
+import { formatQuantity, spokenQuantity, toNumber } from "@/lib/quantity";
 import type { Occurrence } from "../calendar";
 import { useCompleteOccurrence } from "../hooks/useCompleteOccurrence";
 import { useSkipOccurrence } from "../hooks/useSkipOccurrence";
@@ -23,6 +24,30 @@ function suggestedAmount({ needed, available }: LackingIngredientResponse) {
   }
   const shortfall = available && available.unit === needed.unit ? toNumber(needed.amount) - toNumber(available.amount) : toNumber(needed.amount);
   return { amount: shortfall, unit: needed.unit };
+}
+
+function mealSpeech(occurrence: Occurrence): string[] {
+  const { event, availability, recipe, mealType, date } = occurrence;
+  const status = event
+    ? event.status === "Completed"
+      ? "This meal is done."
+      : "This meal was skipped."
+    : availability?.status === "Ready"
+      ? "You have everything you need."
+      : availability?.status === "Partial"
+        ? "You have some of what you need."
+        : "You don't have any of what you need.";
+
+  return [
+    `${recipe.name}, for ${mealType.toLowerCase()} on ${formatWeekdayLong(parseISODate(date))}.`,
+    status,
+    ...(availability?.lacking ?? []).map(
+      item =>
+        `${item.ingredientName}: you need ${item.needed ? spokenQuantity(item.needed.amount, item.needed.unit) : "some"}, and you have ${
+          item.available ? spokenQuantity(item.available.amount, item.available.unit) : "none"
+        }.`,
+    ),
+  ];
 }
 
 export function OccurrenceDialogContent({ occurrence, onDone }: OccurrenceDialogContentProps) {
@@ -47,6 +72,8 @@ export function OccurrenceDialogContent({ occurrence, onDone }: OccurrenceDialog
           <OccurrenceStatusTag occurrence={occurrence} />
         </div>
       </DialogHeader>
+
+      <ReadAloudControls owner={`meal-${scheduleId}-${date}`} lines={mealSpeech(occurrence)} label="Read this aloud" />
 
       {recipe.isPending && <p className="text-muted-foreground">Loading the recipe…</p>}
       {recipe.isError && (

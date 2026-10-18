@@ -28,10 +28,10 @@ export function PreferencesForm({ existing, firstVisit, onSaved }: PreferencesFo
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <DialogHeader>
-        <DialogTitle>{firstVisit ? "Welcome to Nosh" : "Your dietary preferences"}</DialogTitle>
+        <DialogTitle>{firstVisit ? "What do you eat?" : "Your dietary requirements"}</DialogTitle>
         <DialogDescription>
           {firstVisit
-            ? "Tell us how you like to eat and we'll show you recipes that suit you. You can change this any time."
+            ? "Tell us how you like to eat and we'll show you recipes that suit you. You can change this any time under Diet."
             : "We'll show you recipes that suit these. Pick as many as you like, or none."}
         </DialogDescription>
       </DialogHeader>

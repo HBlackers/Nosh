@@ -1,9 +1,14 @@
 import { useSyncExternalStore } from "react";
 import { DEFAULT_SETTINGS } from "../settings";
-import { getSettings, subscribe, updateSettings } from "../store";
+import { confirmSettings, getState, subscribe, updateSettings } from "../store";
 
-export const useAccessibility = () => ({
-  settings: useSyncExternalStore(subscribe, getSettings),
-  update: updateSettings,
-  reset: () => updateSettings(DEFAULT_SETTINGS),
-});
+export const useAccessibility = () => {
+  const state = useSyncExternalStore(subscribe, getState);
+  return {
+    settings: state.settings,
+    configured: state.configured,
+    update: updateSettings,
+    confirm: confirmSettings,
+    reset: () => updateSettings(DEFAULT_SETTINGS),
+  };
+};

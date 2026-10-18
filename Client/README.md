@@ -140,7 +140,7 @@ Reads the server's shopping list for the selected week: **To buy**, **Covered**,
 ### Diet and accessibility (nav buttons at the bottom)
 
 - **Diet** opens the saved dietary requirements, which recipes, starter recipes and the planning picker start filtered by. A new visitor sees it first, before anything else.
-- **Accessibility** lets a person change the **text size** (Smaller, Normal, Large, Larger, Largest; Normal is the default) and switch the whole app to a **dyslexia-friendly font** (OpenDyslexic). Both are saved on that device, apply straight away on the next visit, and everything on the page scales with the text size. The font files are only downloaded when someone asks for them.
+- **Accessibility** is also the very first dialog a new visitor sees, with the usual settings already picked, followed by the Diet dialog and then the recipes page. It lets a person change the **text size** (Smaller, Normal, Large, Larger, Largest; Normal is the default) and switch the whole app to a **dyslexia-friendly font** (OpenDyslexic). and turn on **read aloud**, with a UK English voice and a speed of their choice. Everything is saved on that device and applies straight away on the next visit, and the whole page scales with the text size. The font files are only downloaded when someone asks for them. Read aloud adds a button to recipes (with a button to read from any step), to a meal's dialog on the calendar and to the shopping list; it reads content only, never buttons or menus, and when it is off none of those buttons appear.
 
 ### Recipes (`/recipes`) and ingredients (`/ingredients`)
 

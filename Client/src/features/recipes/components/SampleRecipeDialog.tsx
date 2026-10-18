@@ -20,6 +20,8 @@ export function SampleRecipeDialog({ sample, onClose }: SampleRecipeDialogProps)
             </DialogHeader>
 
             <RecipeDetails
+              title={sample.name}
+              speechId={`sample-${sample.slug}`}
               cuisine={sample.cuisine}
               serves={sample.serves}
               mealTypes={sample.mealTypes}

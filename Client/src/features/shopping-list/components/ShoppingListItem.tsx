@@ -17,7 +17,7 @@ function detail(item: ShoppingListItemResponse): string | null {
   return needed ? `Need ${needed}` : null;
 }
 
-export function ShoppingListItem({ item }: { item: ShoppingListItemResponse }) {
+export function ShoppingListItem({ item, reading = false }: { item: ShoppingListItemResponse; reading?: boolean }) {
   const add = useAddStock();
   const covered = item.status === "Covered";
   const mismatch = item.status === "UnitMismatch";
@@ -46,7 +46,7 @@ export function ShoppingListItem({ item }: { item: ShoppingListItemResponse }) {
 
   if (mismatch) {
     return (
-      <li className="flex min-h-14 items-center gap-4 border-t px-4 py-3 first:border-t-0">
+      <li aria-current={reading ? "true" : undefined} className={cn("flex min-h-14 items-center gap-4 border-t px-4 py-3 first:border-t-0", reading && "bg-accent")}>
         <span aria-hidden="true" className="flex size-7 shrink-0 items-center justify-center">
           <TriangleAlert className="size-5" />
         </span>
@@ -59,7 +59,7 @@ export function ShoppingListItem({ item }: { item: ShoppingListItemResponse }) {
   }
 
   return (
-    <li className="border-t first:border-t-0">
+    <li aria-current={reading ? "true" : undefined} className={cn("border-t first:border-t-0", reading && "bg-accent")}>
       <label className={cn("flex min-h-14 items-center gap-4 px-4 py-3", !covered && "cursor-pointer")}>
         <input type="checkbox" checked={covered} disabled={covered || add.isPending} onChange={got} className="peer sr-only" />
         <span

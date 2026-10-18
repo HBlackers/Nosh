@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { ReadAloudControls, useReadAloud } from "@/features/accessibility";
 import { Button } from "@/components/ui/button";
 import type { ShoppingListResponse } from "@/lib/api/generated";
-import { formatQuantity } from "@/lib/quantity";
+import { formatQuantity, spokenQuantity } from "@/lib/quantity";
 import { ShoppingListItem } from "./ShoppingListItem";
 
 type ShoppingListProps = {
@@ -17,6 +18,12 @@ export function ShoppingList({ list, title }: ShoppingListProps) {
   const { items, unplannedStock } = list;
   const covered = items.filter(item => item.status === "Covered");
   const toBuy = items.filter(item => item.status !== "Covered");
+  const speech = [
+    `${title.replace("–", "to")}.`,
+    toBuy.length === 0 ? "There is nothing to buy." : `${toBuy.length} ${toBuy.length === 1 ? "thing" : "things"} to buy.`,
+    ...toBuy.map(item => (item.toBuy ? `${spokenQuantity(item.toBuy.amount, item.toBuy.unit)} ${item.toBuy.unit ? "of " : ""}${item.ingredientName}.` : `${item.ingredientName}.`)),
+  ];
+  const { index } = useReadAloud("shopping-list");
   const progress = items.length === 0 ? 0 : Math.round((covered.length / items.length) * 100);
 
   const copy = async () => {
@@ -54,6 +61,7 @@ export function ShoppingList({ list, title }: ShoppingListProps) {
         <p className="text-muted-foreground">
           {covered.length} of {items.length} covered
         </p>
+        <ReadAloudControls owner="shopping-list" lines={speech} label="Read list aloud" />
         <Button variant="outline" size="lg" onClick={() => void copy()} disabled={toBuy.length === 0}>
           {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
           {copied ? "Copied" : "Copy list"}
@@ -66,8 +74,8 @@ export function ShoppingList({ list, title }: ShoppingListProps) {
             To buy
           </h2>
           <ul className="overflow-hidden rounded-xl border bg-card">
-            {toBuy.map(item => (
-              <ShoppingListItem key={`${item.ingredientId}-${item.needed?.unit ?? "none"}`} item={item} />
+            {toBuy.map((item, position) => (
+              <ShoppingListItem key={`${item.ingredientId}-${item.needed?.unit ?? "none"}`} item={item} reading={index === position + 2} />
             ))}
           </ul>
         </section>

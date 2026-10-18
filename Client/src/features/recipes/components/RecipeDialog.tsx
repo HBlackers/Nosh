@@ -55,6 +55,8 @@ function RecipeDialogContent({ recipe }: { recipe: RecipeSummaryResponse }) {
           )}
           {data && (
             <RecipeDetails
+              title={recipe.name}
+              speechId={`recipe-${recipe.id}`}
               cuisine={data.cuisine}
               serves={data.serves}
               mealTypes={data.mealTypes}
