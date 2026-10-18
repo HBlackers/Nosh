@@ -38,7 +38,7 @@ export function PreferencesForm({ existing, firstVisit, onSaved }: PreferencesFo
 
       <FilterTabs label="I eat" options={options} selected={dietary} onChange={setDietary} showAll={false} />
 
-      <p className="text-sm text-muted-foreground">Nothing to pick? That's fine, just carry on.</p>
+      <p className="text-base text-muted-foreground">Nothing to pick? That's fine, just carry on.</p>
 
       {save.isError && <ErrorList messages={problemMessages(save.error)} />}
 

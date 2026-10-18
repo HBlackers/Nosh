@@ -42,7 +42,7 @@ export function InventoryPage() {
       )}
 
       {data && (
-        <div aria-busy={isPlaceholderData} className={cn("space-y-6", isPlaceholderData && "opacity-70 transition-opacity")}>
+        <div aria-busy={isPlaceholderData} className={cn("space-y-6", isPlaceholderData && "opacity-90 transition-opacity")}>
           {data.items.length === 0 ? (
             <p className="text-muted-foreground">{q ? "Nothing in stock matches your search." : "Nothing in stock yet. Add what's in your cupboards."}</p>
           ) : (

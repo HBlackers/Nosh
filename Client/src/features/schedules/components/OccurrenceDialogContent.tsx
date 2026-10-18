@@ -91,7 +91,7 @@ export function OccurrenceDialogContent({ occurrence, onDone }: OccurrenceDialog
       )}
 
       {failed && (
-        <p role="alert" className="text-sm">
+        <p role="alert" className="text-base">
           That didn't work. Please try again.
         </p>
       )}
@@ -131,13 +131,13 @@ function IngredientRow({ line, lacking, checked }: IngredientRowProps) {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-semibold">{line.ingredientName}</p>
-          {line.prep && <p className="text-sm text-muted-foreground">{line.prep}</p>}
+          {line.prep && <p className="text-base text-muted-foreground">{line.prep}</p>}
         </div>
         <p className="shrink-0">{line.quantity === null ? "To taste" : formatQuantity(line.quantity, line.unit)}</p>
       </div>
 
       {checked && !lacking && (
-        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+        <p className="flex items-center gap-1.5 text-base text-muted-foreground">
           <Check className="size-4" aria-hidden="true" />
           In stock
         </p>
@@ -145,7 +145,7 @@ function IngredientRow({ line, lacking, checked }: IngredientRowProps) {
 
       {lacking && (
         <div className="space-y-2">
-          <p className="flex items-center gap-1.5 text-sm">
+          <p className="flex items-center gap-1.5 text-base">
             <CircleX className="size-4 text-destructive" aria-hidden="true" />
             {lacking.available ? `You have ${formatQuantity(lacking.available.amount, lacking.available.unit)}` : "None in stock"}
           </p>

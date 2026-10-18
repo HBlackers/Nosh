@@ -1,7 +1,7 @@
 import { Check, Repeat, Undo2 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { Occurrence } from "../calendar";
 import { useCompleteOccurrence } from "../hooks/useCompleteOccurrence";
@@ -20,16 +20,17 @@ export function OccurrenceCard({ occurrence }: { occurrence: Occurrence }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <div className={cn("rounded-md border-l-4 px-1.5 py-1.5 text-sm", stripe, card)}>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="block w-full rounded-sm text-left font-semibold leading-snug wrap-break-word outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          >
-            {recipe.name}
-            {occurrence.isRecurring && <Repeat className="ml-1 inline size-3.5 align-[-2px]" aria-label="Repeats" />}
-          </button>
-        </DialogTrigger>
+      <div
+        onClick={() => setOpen(true)}
+        className={cn("cursor-pointer rounded-md border-l-4 px-1.5 py-1.5 text-base hover:brightness-105", stripe, card)}
+      >
+        <button
+          type="button"
+          className="block w-full rounded-sm text-left font-semibold leading-snug wrap-break-word outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          {recipe.name}
+          {occurrence.isRecurring && <Repeat className="ml-1 inline size-3.5 align-[-2px]" aria-label="Repeats" />}
+        </button>
 
         <div className="mt-1.5 flex flex-wrap items-center justify-between gap-1">
           <OccurrenceStatusTag occurrence={occurrence} />
@@ -39,7 +40,10 @@ export function OccurrenceCard({ occurrence }: { occurrence: Occurrence }) {
               size="icon-lg"
               aria-label={`Undo ${recipe.name}`}
               disabled={undo.isPending}
-              onClick={() => undo.mutate(event.id)}
+              onClick={clicked => {
+                clicked.stopPropagation();
+                undo.mutate(event.id);
+              }}
             >
               <Undo2 aria-hidden="true" />
             </Button>
@@ -49,7 +53,10 @@ export function OccurrenceCard({ occurrence }: { occurrence: Occurrence }) {
               size="icon-lg"
               aria-label={`Complete ${recipe.name}`}
               disabled={complete.isPending}
-              onClick={() => complete.mutate({ scheduleId, date })}
+              onClick={clicked => {
+                clicked.stopPropagation();
+                complete.mutate({ scheduleId, date });
+              }}
             >
               <Check aria-hidden="true" />
             </Button>
@@ -57,7 +64,7 @@ export function OccurrenceCard({ occurrence }: { occurrence: Occurrence }) {
         </div>
 
         {failed && (
-          <p role="alert" className="mt-1 text-xs">
+          <p role="alert" className="mt-1 text-base">
             That didn't work. Please try again.
           </p>
         )}

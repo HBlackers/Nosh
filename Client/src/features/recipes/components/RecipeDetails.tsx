@@ -48,7 +48,7 @@ export function RecipeDetails({ cuisine, serves, mealTypes, dietary, lines, meth
             <li key={`${line.name}-${index}`} className="flex items-start justify-between gap-3 px-3 py-2.5">
               <div className="min-w-0">
                 <p className="font-semibold">{line.name}</p>
-                {line.prep && <p className="text-sm text-muted-foreground">{line.prep}</p>}
+                {line.prep && <p className="text-base text-muted-foreground">{line.prep}</p>}
               </div>
               <p className="shrink-0">{line.quantity === null ? "To taste" : formatQuantity(line.quantity, line.unit)}</p>
             </li>

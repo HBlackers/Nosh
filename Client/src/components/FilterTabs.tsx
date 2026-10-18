@@ -17,7 +17,7 @@ export function FilterTabs<T extends string>({ label, options, selected, onChang
 
   return (
     <div role="group" aria-labelledby={labelId} className="flex flex-wrap items-center gap-2">
-      <span id={labelId} className="mr-1 text-sm font-semibold text-muted-foreground">
+      <span id={labelId} className="mr-1 text-base font-semibold text-muted-foreground">
         {label}
       </span>
       {showAll && (

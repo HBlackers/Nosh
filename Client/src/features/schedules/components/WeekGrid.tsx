@@ -23,7 +23,7 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
         <caption className="sr-only">Recipes planned for the week</caption>
         <thead>
           <tr>
-            <td className="w-21" />
+            <td className="w-24" />
             {days.map(day => {
               const isToday = toISODate(day) === todayISO;
               return (
@@ -34,7 +34,7 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
                   aria-label={formatWeekdayLong(day)}
                   className={cn("border-l px-1 py-3 text-center font-normal", isToday && "bg-primary/15")}
                 >
-                  <span className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">{formatWeekday(day)}</span>
+                  <span className="block text-base font-semibold uppercase tracking-wide text-muted-foreground">{formatWeekday(day)}</span>
                   <span
                     className={cn(
                       "mx-auto mt-1 flex size-9 items-center justify-center rounded-full font-heading text-lg font-bold",
@@ -51,7 +51,7 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
         <tbody>
           {MEAL_TYPES.map(meal => (
             <tr key={meal} className="border-t">
-              <th scope="row" className="px-2 py-3 text-left align-top text-[11px] font-semibold uppercase text-muted-foreground">
+              <th scope="row" className="px-2 py-3 text-left align-top text-base font-semibold text-muted-foreground">
                 {meal}
               </th>
               {days.map(day => {
@@ -66,7 +66,7 @@ export function WeekGrid({ weekStart, occurrences, today }: WeekGridProps) {
                           <button
                             type="button"
                             aria-label={`Plan a recipe for ${formatWeekdayLong(day)}, ${meal}`}
-                            className="flex h-full min-h-20 w-full items-center justify-center rounded-md border border-dashed text-muted-foreground opacity-60 outline-none hover:bg-accent hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                            className="flex h-full min-h-20 w-full items-center justify-center rounded-md border border-dashed border-input text-muted-foreground outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring"
                           >
                             <Plus className="size-5" aria-hidden="true" />
                           </button>

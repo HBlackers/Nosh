@@ -143,4 +143,26 @@ Searchable, paged lists (recipes also filter by dietary requirement). Each page 
 
 ## UI and brand
 
-Everything is driven by semantic tokens in `styles/globals.css`: use `bg-primary`, `text-foreground` and friends, never hard-coded hex, white or black. Nosh Green leads, Charcoal is for backgrounds and text, Coral and Leaf are small accents. Aim for AA contrast, tap targets of at least 40px, and body text of at least 16px so it works on small, older phones. The full palette and rules are in [`Agent.md`](Agent.md).
+The look comes from the Project Nosh brand slide and lives in `styles/globals.css` as semantic tokens: use `bg-primary`, `text-foreground` and friends, never hard-coded hex, white or black. The full palette and the rules for using it are in [`Agent.md`](Agent.md).
+
+| Area | The rule |
+| --- | --- |
+| **Logo** | Only on Nosh Charcoal or white, with clear space of at least the width of the "O". Never recolour, stretch, rotate or add effects. |
+| **Colour** | Nosh Green `#62CC9B` leads. Deep Teal `#3AA58F` and Nosh Charcoal `#2E373E` support. Flame Coral `#F3764B` and Leaf `#D5C52D` are small accents (highlights, badges, warnings). Cloud Grey `#B7BFC0` is muted text on dark. |
+| **Type** | Nunito Bold headings (Arial fallback), Nunito Sans or the system sans for body. |
+| **Voice** | Warm and practical, never preachy or judgemental about budgets. Plain words, short sentences, no jargon, no guilt. |
+| **Accessibility** | WCAG AA minimum, and it must work well on older, smaller phones. |
+
+### Accessibility and older phones
+
+Nosh serves people on older, smaller phones, so **WCAG 2.1 AA is the minimum**. In practice that means:
+
+- **Text contrast:** 4.5:1 for normal text and 3:1 for large text, in both the light and dark themes. Text on a brand colour is Charcoal, never white.
+- **Control edges and icons:** the border of an input, select or outlined button, and any icon that tells people they can act, needs 3:1. Decorative borders can be lighter. Never fade a meaningful icon to make it look quiet.
+- **Not just colour:** the calendar's green, yellow and coral stock status also has an icon and a label.
+- **Touch first:** tap targets of at least 40px, all text at least 16px (no `text-sm` or `text-xs`), and a layout that works at 320px and 375px wide without sideways scrolling. Design the phone view first.
+- **Hover and focus:** hover uses `hover:brightness-105` or a solid token, never opacity or a transparent tint (focus rings are solid too), and nothing works by hover alone. Everything works by tap and by keyboard, with a visible focus ring and proper labels.
+- **Older browsers:** avoid very new JavaScript built-ins and check CSS features before using them.
+- **Light pages:** no heavy dependencies or large images.
+
+The numbered rules and a checklist for finishing UI work are in [`Agent.md`](Agent.md#accessibility-and-small-phones). To check your own work, view the page at phone width (the browser pane's Mobile preset works), tab through it, and look at it in the dark theme.

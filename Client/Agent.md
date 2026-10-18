@@ -140,6 +140,18 @@ const { data, isPending } = useMeals();
 
 Source: Project Nosh brand slide ("Brand essentials"). Everything lives in `styles/globals.css`.
 
+### Brand essentials at a glance
+
+| Area | The rule from the slide |
+| --- | --- |
+| **Logo** | Only on Nosh Charcoal or white. Clear space of at least the width of the "O". Never recolour, stretch, rotate or add effects. |
+| **Colour** | Nosh Green `#62CC9B` primary, Deep Teal `#3AA58F` secondary, Nosh Charcoal `#2E373E` backgrounds and text, Flame Coral `#F3764B` and Leaf `#D5C52D` accents, Cloud Grey `#B7BFC0` muted text on dark. **Nosh Green leads.** Teal and Charcoal support. Coral and Leaf are small accents (highlights, badges, warnings). |
+| **Type** | Nunito. Headings Nunito Bold (fallback Arial). Body Nunito Sans or the system sans. |
+| **Voice** | Warm and practical, never preachy or judgemental about budgets. Plain language: short words, no jargon, no guilt. |
+| **Accessibility** | WCAG AA contrast minimum. Must work well on older, smaller phones. |
+
+The sections below turn each of these into rules for code. The slide's Enablis logo (top right) belongs to the challenge provider and is not used in the app.
+
 ### Use tokens, not hex
 
 Use semantic Tailwind classes (`bg-primary`, `text-foreground`, `text-muted-foreground`, `border-border`) in components. Use brand classes (`bg-nosh-charcoal`, `text-cloud-grey`, `text-nosh-green`) only for deliberately branded surfaces such as the header. Never hard-code hex values, `text-white`, `text-black` or `bg-black` in components.
@@ -162,7 +174,7 @@ Derived AA-safe variants (used because the brand colours alone fail contrast in 
 | `teal-ink` | `#1F7A68` | Deep Teal for text and links on light surfaces |
 | `charcoal-raised` | `#333D44` | Raised surfaces (cards) on Charcoal |
 
-These lighter and tinted values are used through the semantic tokens in `globals.css`, not as their own classes: `#4EAE9A` is `secondary` (Deep Teal for fills that carry Charcoal text), `#F4845D` is `destructive` (Flame Coral for fills that carry Charcoal text), `#F2F6F4` is the light `background`, `#D8DCE0` is `border`/`input`, and `#4A555F` is `muted-foreground` on light and the dark `border`. Add a token to `@theme` only when something needs it as a class.
+These lighter and tinted values are used through the semantic tokens in `globals.css`, not as their own classes: `#4EAE9A` is `secondary` (Deep Teal for fills that carry Charcoal text), `#F4845D` is `destructive` (Flame Coral for fills that carry Charcoal text), `#F2F6F4` is the light `background`, `#D8DCE0` is `border` (decorative edges only, see colour rule 10), `#7F8A91` (dark `#838E96`) is `input`, the control-edge colour at 3:1 or better on white, Mist and the cards, and `#1F7A68` (Teal Ink) is the light `ring` (dark `#62CC9B`), and `#4A555F` is `muted-foreground` on light and the dark `border`. Add a token to `@theme` only when something needs it as a class.
 
 ### Colour rules
 
@@ -174,7 +186,30 @@ These lighter and tinted values are used through the semantic tokens in `globals
 6. **Don't use Nosh Green, Teal or Coral as text on white or Mist** (all under 4.5:1). On light surfaces use Charcoal, or `teal-ink` for links.
 7. **WCAG AA is the minimum**: 4.5:1 for normal text, 3:1 for large text and UI boundaries. It must work on older, small phones: keep tap targets at least 40px and body text at least 16px.
 8. **Colour is never the only signal.** Pair coral/leaf states with an icon or text.
-9. **Hover states** use `hover:brightness-105`, not transparency. Reducing opacity over a background lowers contrast with Charcoal text.
+9. **Hover and focus states** use `hover:brightness-105` or a solid token (`hover:bg-accent`), never opacity or a transparent tint (`opacity-*`, `bg-accent/40`, `ring-ring/50`). Reducing opacity over a background lowers contrast with Charcoal text. Disabled and loading states may dim, but anything that must stay readable still needs its contrast while dimmed (lists dim to `opacity-90` while refetching because muted text drops below 4.5:1 at `opacity-80` and under).
+10. **Control edges need 3:1.** The border of an input, select or outlined button, and any edge a person needs to find a control by, must be at least 3:1 against the surface it sits on (WCAG 1.4.11). Use the `input` token for these, and keep `border` for decoration (cards, dividers). Check this in the light and the dark theme.
+11. **Affordances keep full contrast.** An icon or outline that tells people they can act (the + in an empty calendar cell, a drag handle, a chevron) is a meaningful icon, so it needs 3:1 and is never faded to look quiet.
+
+### Clickable things show a pointer
+
+Tailwind v4's reset gives buttons the default arrow cursor, so `styles/globals.css` has a base rule that restores `cursor: pointer` for enabled buttons, `role="button"`, `role="tab"`, `role="option"`, `summary`, labels with `for` and checkboxes or radios. Links already have it. Any other element that handles a click (a table row, a card, a `div`) needs `cursor-pointer` on it, and Radix list items (for example `SelectItem`) must not use `cursor-default`. A clickable row or card keeps a real button inside it for keyboard users, and any button inside it that does something else calls `stopPropagation()`.
+
+### Accessibility and small phones
+
+Nosh serves people on older, smaller phones, so **WCAG 2.1 AA is the minimum, not a goal**. Check every new screen and component against these before calling it done:
+
+1. **Contrast.** 4.5:1 for normal text, 3:1 for large text (24px, or 18.66px bold) and for icons and borders that carry meaning. Use the palette and the pairings in the colour rules above. If you need a pairing that isn't already used somewhere, work out its ratio first, and check it in both the light and dark themes.
+2. **Colour is never the only signal.** Pair it with an icon or text (the calendar's stock tags say Ready, Some missing or Missing as well as being green, yellow or coral).
+3. **Tap targets are at least 40px by 40px**, with a little space between them. A default `Button` is 40px tall, `size="icon"` and `size="icon-lg"` are 40px square (icon-only buttons always need an `aria-label`), and nav links use `min-h-11` or more. The `sm` and `icon-sm` sizes are under 40px, so don't use them for actions on touch. Inputs and select triggers are `h-10`.
+4. **Text is at least 16px, everywhere.** That includes captions, tags, table headers, form labels, error text and the text inside buttons and badges. **Don't use `text-sm`, `text-xs` or an arbitrary size below 16px** (for example `text-[11px]`); use `text-base` or larger. Tell secondary text apart by colour (`text-muted-foreground`) and weight, not by making it smaller. Allow short labels to wrap rather than shrink them.
+5. **Layout.** Design the phone first and widen up: it must work at 320px and 375px wide with no sideways scrolling of the page (a table may scroll inside its own container). Dialogs must fit the screen and scroll inside themselves (`max-h-[90dvh]`).
+6. **Nothing is hover-only.** Hover can add polish but everything must work by tap and by keyboard.
+7. **Keyboard and screen readers.** Use real buttons and links, keep the visible focus ring (`focus-visible:ring-[3px] focus-visible:ring-ring`, as the `ui/` components do; it is solid and at least 3:1, and on the Charcoal nav it is `ring-nosh-green`), label every input (`aria-label` when there's no visible label), and use `aria-pressed`, `aria-selected` and `aria-current` for toggles, tabs and the current page. Errors that appear after an action use `role="alert"`. Use the Radix dialog so focus is trapped and Escape closes it.
+8. **Older browsers.** Avoid very new JavaScript built-ins (for example `Map.groupBy` or `toSorted`) and check a new CSS feature on caniuse before using it. The calendar already relies on container queries, which need a reasonably recent browser, so don't add more of that kind without a reason.
+9. **Keep it light.** No heavy dependencies or large images. Look at the size `bun run build` reports before and after adding a library.
+10. **Words.** Plain, short, warm. No jargon and no guilt.
+
+To check UI work: run `bun run typecheck` and `bun run build`, view the page at 320px and 375px wide (the browser pane's Mobile preset), tab through it with the keyboard, and look at it in the dark theme.
 
 ### Themes
 
@@ -188,6 +223,16 @@ These lighter and tinted values are used through the semantic tokens in `globals
 - Body: **Nunito Sans** or the system sans (`font-sans`).
 - Loaded from Google Fonts in `src/index.html`.
 
+### Voice
+
+Warm and practical, like a friend who is good with money and never makes you feel bad about it.
+
+- **Plain words, short sentences.** "We couldn't load your recipes. Please try again." not "Request failed (500)".
+- **Never judge a budget or a choice.** No "only", "just", "simply", "you should have" or "unfortunately". Don't comment on what people can or can't afford.
+- **No jargon.** No "mismatch", "invalid", "entity" or error codes in what people see. Say what happened and what to do next.
+- **No guilt.** Missing stock, a skipped meal or an empty week are normal states, not mistakes: "Some missing", "Skipped", "Nothing planned".
+- **Say what will happen.** Buttons say the action ("Add to my recipes", "Plan it"), and the first thing a new person sees should always have a way forward.
+
 ### Logo
 
 Component: `src/components/Logo.tsx`. Assets in `src/assets/`: `logo.png` (full master, has its own Charcoal background) and `logo-icon.png` (icon only, transparent). Variants: `<Logo />` (icon, default) and `<Logo variant="full" />`.
@@ -199,4 +244,4 @@ Component: `src/components/Logo.tsx`. Assets in `src/assets/`: `logo.png` (full 
 
 ### Adding shadcn components
 
-`bunx --bun shadcn@latest add <component>`, then check the result against the rules above. Generated components may contain `text-white` or opacity-based hovers: replace them with the tokens.
+`bunx --bun shadcn@latest add <component>`, then check the result against the rules above. Generated components may contain `text-white`, opacity-based hovers or focus rings (`/50`), `text-sm` or `text-xs`, 36px (`h-9`) controls, or a faint `border` on inputs and outlined buttons: replace them with the tokens, `text-base` and the 40px sizes.

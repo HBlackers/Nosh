@@ -44,7 +44,7 @@ export function SideNav({ footer }: { footer?: ReactNode }) {
     >
       <div className="grid grid-cols-[2.5rem_1fr_2.5rem] items-center lg:block">
         <span aria-hidden="true" className="lg:hidden" />
-        <Link to="/" aria-label="Nosh home" onClick={() => setOpen(false)} className="justify-self-center lg:justify-self-auto">
+        <Link to="/" aria-label="Nosh home" onClick={() => setOpen(false)} className="justify-self-center outline-nosh-green lg:justify-self-auto">
           <Logo variant="full" className="w-28 lg:w-44" />
         </Link>
         <button
@@ -53,7 +53,7 @@ export function SideNav({ footer }: { footer?: ReactNode }) {
           aria-expanded={open}
           aria-controls={menuId}
           onClick={() => setOpen(!open)}
-          className="flex size-10 items-center justify-center rounded-lg text-cloud-grey hover:bg-charcoal-raised hover:text-nosh-green focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none lg:hidden"
+          className="flex size-10 items-center justify-center rounded-lg text-cloud-grey hover:bg-charcoal-raised hover:text-nosh-green focus-visible:ring-[3px] focus-visible:ring-nosh-green focus-visible:outline-none lg:hidden"
         >
           {open ? <X className="size-6" aria-hidden="true" /> : <Menu className="size-6" aria-hidden="true" />}
         </button>
@@ -68,7 +68,7 @@ export function SideNav({ footer }: { footer?: ReactNode }) {
                   to={to}
                   activeOptions={{ exact: true, includeSearch: false }}
                   onClick={() => setOpen(false)}
-                  className="flex min-h-14 items-center gap-4 rounded-lg px-3 py-2.5 text-xl font-semibold text-cloud-grey hover:bg-charcoal-raised hover:text-nosh-green data-[status=active]:bg-charcoal-raised data-[status=active]:text-nosh-green lg:min-h-11 lg:gap-3 lg:text-base"
+                  className="flex min-h-14 items-center gap-4 rounded-lg px-3 py-2.5 text-xl font-semibold text-cloud-grey outline-nosh-green hover:bg-charcoal-raised hover:text-nosh-green data-[status=active]:bg-charcoal-raised data-[status=active]:text-nosh-green lg:min-h-11 lg:gap-3 lg:text-base"
                 >
                   <Icon className="size-6 lg:size-5" aria-hidden="true" />
                   {label}

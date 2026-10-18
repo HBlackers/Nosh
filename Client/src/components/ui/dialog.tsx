@@ -22,7 +22,7 @@ function DialogContent({ className, children, hideClose = false, ...props }: Rea
         {!hideClose && (
           <DialogPrimitive.Close
             aria-label="Close"
-            className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+            className="absolute right-3 top-3 flex size-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none"
           >
             <X className="size-5" aria-hidden="true" />
           </DialogPrimitive.Close>

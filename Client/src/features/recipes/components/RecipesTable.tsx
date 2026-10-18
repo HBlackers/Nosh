@@ -27,7 +27,7 @@ export function RecipesTable({ recipes, onView }: RecipesTableProps) {
               <TableCell className="whitespace-normal px-4 py-3 font-semibold">
                 <button
                   type="button"
-                  className="rounded-sm text-left outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  className="rounded-sm text-left outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   {recipe.name}
                 </button>

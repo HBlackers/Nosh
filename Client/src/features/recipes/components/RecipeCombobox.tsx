@@ -93,7 +93,7 @@ export function RecipeCombobox({ value, onChange, label }: RecipeComboboxProps) 
       )}
 
       {open && items.length > 0 && (
-        <ul id={listId} role="listbox" aria-label={`${label} suggestions`} className="rounded-lg border bg-card p-1 text-sm">
+        <ul id={listId} role="listbox" aria-label={`${label} suggestions`} className="rounded-lg border bg-card p-1 text-base">
           {items.map((item, index) => (
             <li
               key={item.id}
@@ -112,7 +112,7 @@ export function RecipeCombobox({ value, onChange, label }: RecipeComboboxProps) 
       )}
 
       {open && data && items.length === 0 && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-base text-muted-foreground">
           {suitable ? "No recipes that suit you match. Try showing all your recipes." : "No recipes match. Add one on the Recipes page first."}
         </p>
       )}

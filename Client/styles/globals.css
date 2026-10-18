@@ -63,8 +63,8 @@
   --destructive: #f4845d;
   --destructive-foreground: #2e373e;
   --border: #d8dce0;
-  --input: #d8dce0;
-  --ring: #3aa58f;
+  --input: #7f8a91;
+  --ring: #1f7a68;
 }
 
 .dark {
@@ -85,13 +85,13 @@
   --destructive: #f4845d;
   --destructive-foreground: #2e373e;
   --border: #4a555f;
-  --input: #4a555f;
+  --input: #838e96;
   --ring: #62cc9b;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
   body {
     @apply bg-background text-foreground font-sans;
@@ -101,5 +101,16 @@
   h3,
   h4 {
     @apply font-heading font-bold;
+  }
+  /* Tailwind v4's reset leaves buttons with the default arrow cursor, so anything clickable opts back in here. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  [role="option"],
+  summary,
+  label[for],
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    cursor: pointer;
   }
 }

@@ -37,7 +37,7 @@ export function Tabs<T extends string>({ label, tabs, value, onChange }: TabsPro
               }
             }}
             className={cn(
-              "-mb-px min-h-11 border-b-2 px-4 py-2 font-semibold outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50",
+              "-mb-px min-h-11 border-b-2 px-4 py-2 font-semibold outline-none focus-visible:ring-[3px] focus-visible:ring-ring",
               selected ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground",
             )}
           >

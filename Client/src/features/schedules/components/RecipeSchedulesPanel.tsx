@@ -74,12 +74,12 @@ function ScheduleRow({ schedule, onEdit }: { schedule: ScheduleResponse; onEdit:
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="font-semibold">{when}</p>
-          <p className="text-sm text-muted-foreground">{range}</p>
+          <p className="text-base text-muted-foreground">{range}</p>
         </div>
 
         {confirming ? (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm">Remove it from the calendar?</span>
+            <span className="text-base">Remove it from the calendar?</span>
             <Button variant="destructive" size="lg" disabled={remove.isPending} onClick={() => remove.mutate(schedule.id)}>
               {remove.isPending ? "Removing…" : "Yes, remove"}
             </Button>

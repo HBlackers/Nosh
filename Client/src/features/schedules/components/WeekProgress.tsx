@@ -10,7 +10,7 @@ export function WeekProgress({ occurrences }: { occurrences: Occurrence[] }) {
   }
 
   return (
-    <Badge className="px-3 py-1 text-sm">
+    <Badge className="px-3 py-1 text-base">
       <Check className="size-4" aria-hidden="true" />
       {completed} of {total} done
       {skipped > 0 && <span className="font-normal"> · {skipped} skipped</span>}

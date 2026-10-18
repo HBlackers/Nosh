@@ -35,7 +35,7 @@ export function WeekList({ weekStart, occurrences, today }: WeekListProps) {
                 isToday ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
               )}
             >
-              <span className="text-xs font-semibold uppercase tracking-wide">{formatWeekday(day)}</span>
+              <span className="text-base font-semibold uppercase tracking-wide">{formatWeekday(day)}</span>
               <span className="font-heading text-2xl font-bold leading-none">{day.getDate()}</span>
             </div>
 
@@ -56,7 +56,7 @@ export function WeekList({ weekStart, occurrences, today }: WeekListProps) {
               <ul className="flex flex-1 flex-col justify-center gap-2">
                 {items.map(item => (
                   <li key={`${item.scheduleId}-${item.date}`} className="space-y-1">
-                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold">{item.mealType}</span>
+                    <span className="rounded-full bg-muted px-2.5 py-0.5 text-base font-semibold">{item.mealType}</span>
                     <OccurrenceCard occurrence={item} />
                   </li>
                 ))}

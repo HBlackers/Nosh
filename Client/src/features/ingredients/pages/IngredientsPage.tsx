@@ -42,7 +42,7 @@ export function IngredientsPage() {
       )}
 
       {data && (
-        <div aria-busy={isPlaceholderData} className={cn("space-y-6", isPlaceholderData && "opacity-70 transition-opacity")}>
+        <div aria-busy={isPlaceholderData} className={cn("space-y-6", isPlaceholderData && "opacity-90 transition-opacity")}>
           {data.items.length === 0 ? (
             <p className="text-muted-foreground">No ingredients match your search.</p>
           ) : (

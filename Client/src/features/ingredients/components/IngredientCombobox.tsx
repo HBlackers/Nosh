@@ -86,7 +86,7 @@ export function IngredientCombobox({ value, onChange, label }: IngredientCombobo
       />
 
       {open && optionCount > 0 && (
-        <ul id={listId} role="listbox" aria-label={`${label} suggestions`} className="rounded-lg border bg-card p-1 text-sm">
+        <ul id={listId} role="listbox" aria-label={`${label} suggestions`} className="rounded-lg border bg-card p-1 text-base">
           {items.map((item, index) => (
             <li
               key={item.id}
@@ -116,7 +116,7 @@ export function IngredientCombobox({ value, onChange, label }: IngredientCombobo
       )}
 
       {create.isError && (
-        <p role="alert" className="text-sm">
+        <p role="alert" className="text-base">
           {problemMessages(create.error)[0]}
         </p>
       )}

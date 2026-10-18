@@ -30,10 +30,10 @@ export function ShoppingListItem({ item }: { item: ShoppingListItemResponse }) {
     <>
       <span className="min-w-0 flex-1">
         <span className={cn("block font-semibold", covered && "text-muted-foreground")}>{item.ingredientName}</span>
-        <span className="block text-sm text-muted-foreground">For {item.recipes.map(recipe => recipe.name).join(", ")}</span>
-        {note && <span className="block text-sm text-muted-foreground">{note}</span>}
+        <span className="block text-base text-muted-foreground">For {item.recipes.map(recipe => recipe.name).join(", ")}</span>
+        {note && <span className="block text-base text-muted-foreground">{note}</span>}
         {add.isError && (
-          <span role="alert" className="block text-sm">
+          <span role="alert" className="block text-base">
             We couldn't add that to your stock. Please try again.
           </span>
         )}
@@ -64,7 +64,7 @@ export function ShoppingListItem({ item }: { item: ShoppingListItemResponse }) {
         <input type="checkbox" checked={covered} disabled={covered || add.isPending} onChange={got} className="peer sr-only" />
         <span
           aria-hidden="true"
-          className="flex size-7 shrink-0 items-center justify-center rounded-md border-2 border-input bg-card text-primary-foreground peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring/50 [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
+          className="flex size-7 shrink-0 items-center justify-center rounded-md border-2 border-input bg-card text-primary-foreground peer-checked:border-primary peer-checked:bg-primary peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring [&>svg]:opacity-0 peer-checked:[&>svg]:opacity-100"
         >
           <Check className="size-5" />
         </span>

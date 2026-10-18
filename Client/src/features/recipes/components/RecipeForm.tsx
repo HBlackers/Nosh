@@ -117,7 +117,7 @@ export function RecipeForm({ onCreated }: { onCreated: () => void }) {
       <FilterTabs label="Tags" options={tagOptions} selected={tags} onChange={setTags} showAll={false} />
 
       <fieldset className="space-y-3">
-        <legend className="mb-2 text-sm font-semibold text-muted-foreground">Ingredients</legend>
+        <legend className="mb-2 text-base font-semibold text-muted-foreground">Ingredients</legend>
         <ul className="space-y-3">
           {lines.map((line, index) => (
             <li key={line.key} className="space-y-2 rounded-lg border p-3">
@@ -177,7 +177,7 @@ export function RecipeForm({ onCreated }: { onCreated: () => void }) {
       </fieldset>
 
       <fieldset className="space-y-3">
-        <legend className="mb-2 text-sm font-semibold text-muted-foreground">Method</legend>
+        <legend className="mb-2 text-base font-semibold text-muted-foreground">Method</legend>
         <ol className="space-y-3">
           {steps.map((step, index) => (
             <li key={step.key} className="flex gap-2">

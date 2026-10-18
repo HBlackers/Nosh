@@ -60,7 +60,7 @@ export function StarterRecipes() {
       )}
 
       {data && (
-        <div aria-busy={isPlaceholderData} className={cn("space-y-4", isPlaceholderData && "opacity-70 transition-opacity")}>
+        <div aria-busy={isPlaceholderData} className={cn("space-y-4", isPlaceholderData && "opacity-90 transition-opacity")}>
           {data.items.length === 0 ? (
             <p className="text-muted-foreground">No starter recipes match your search.</p>
           ) : (
@@ -81,13 +81,13 @@ export function StarterRecipes() {
 
 function StarterRecipe({ sample, onView }: { sample: SampleRecipeResponse; onView: () => void }) {
   return (
-    <li onClick={onView} className="cursor-pointer space-y-3 rounded-xl border bg-card p-4 hover:bg-accent/40">
+    <li onClick={onView} className="cursor-pointer space-y-3 rounded-xl border bg-card p-4 hover:bg-accent">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
           <h3 className="text-lg">
             <button
               type="button"
-              className="rounded-sm text-left outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/50"
+              className="rounded-sm text-left outline-none hover:underline focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {sample.name}
             </button>
@@ -105,7 +105,7 @@ function StarterRecipe({ sample, onView }: { sample: SampleRecipeResponse; onVie
               </Badge>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-base text-muted-foreground">
             Serves {sample.serves} · {sample.ingredients.length} ingredients
           </p>
         </div>
